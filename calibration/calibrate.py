@@ -50,6 +50,13 @@ print("")
 rms, camera_matrix, dist_coefs, rvecs, tvecs = cv2.calibrateCamera(obj_points, img_points, (w, h))
 print("RMS: "+str(rms))
 print("")
+
+#Camera matrix
+#fx,fy = focal length
+#cy,cy = optical center
+#k1,k2,k3 = radial distortion
+#p1,p2 = tangential distortion
+
 print("Camera.fx: "+str(camera_matrix[0,0]))
 print("Camera.fy: "+str(camera_matrix[1,1]))
 print("Camera.cx: "+str(camera_matrix[0,2]))
