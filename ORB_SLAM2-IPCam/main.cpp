@@ -19,7 +19,7 @@ int main( int argc, char *argv[] )
     //Vocabulary for detecting objects
     string Vocabulary = "../../ORB_SLAM2/ORB_SLAM2/Vocabulary/ORBvoc.txt";
     //ConfigFile
-    string Yaml = "../calibration/Honor3C-640x480.yaml";
+    string Yaml = "../calibration/Honor3C-1280x720.yaml";
     //Video source
     cv::VideoCapture cap;
     std::string videoStreamAddress = "http://192.168.1.47:8080/video";
@@ -39,13 +39,13 @@ int main( int argc, char *argv[] )
     }
 
 
+    // Create SLAM system. It initializes all system threads and gets ready to process frames.
+    ORB_SLAM2::System SLAM(Vocabulary,Yaml,ORB_SLAM2::System::MONOCULAR,true);
+
     if(!cap.open(videoStreamAddress)) {
         std::cout << "Error opening video stream or file" << std::endl;
         return -1;
     }
-
-    // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(Vocabulary,Yaml,ORB_SLAM2::System::MONOCULAR,true);
 
     std::cout << endl << "-------" << std::endl;
     std::cout << "Start processing sequence ..." << std::endl;
