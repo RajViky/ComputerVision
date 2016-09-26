@@ -8,24 +8,25 @@
 
 export PREFIX=/opt/playground
 #Place new things over the system
+#GCC
+#svn checkout svn://gcc.gnu.org/svn/gcc/branches/gcc-6-branch/ gcc
+#mkdir gccobj
+#cd gccobj
+#../gcc/configure --enable-languages=c,c++,fortran \
+    --prefix=$PREFIX \
+    --disable-multilib
+#    --with-system-zlib
+#    --with-default-libstdcxx-abi=gcc4-compatible
+#make bootstrap MAKE="make -j 4"
+#sudo make install
+#cd ..
+
 export PATH=$PREFIX/bin:$PATH
 export INCLUDE_PATH=$PREFIX/include:$PREFIX/include/c++/6.2.1/:$INCLUDE_PATH
 export LIBRARY_PATH=$PREFIX/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$PREFIX/lib:$LD_LIBRARY_PATH
 export C_INCLUDE_PATH=$PREFIX/include:$PREFIX/include/c++/6.2.1/:$C_INCLUDE_PATH
 export CPLUS_INCLUDE_PATH=$PREFIX/include:$PREFIX/include/c++/6.2.1/:$CPLUS_INCLUDE_PATH
-#GCC
-svn checkout svn://gcc.gnu.org/svn/gcc/branches/gcc-6-branch/ gcc
-mkdir gccobj
-cd gccobj
-../gcc/configure --enable-languages=c,c++ \
-    --prefix=$PREFIX \
-    --disable-multilib \
-    --with-system-zlib \
-    --with-default-libstdcxx-abi=gcc4-compatible
-make bootstrap MAKE="make -j 4"
-sudo make install
-cd ..
 
 #Python 2.7.12
 wget https://www.python.org/ftp/python/2.7.12/Python-2.7.12.tgz --no-check-certificate
@@ -106,5 +107,7 @@ git clone https://github.com/stevenlovegrove/Pangolin.git
 cd Pangolin
 mkdir build
 cd build
-cmake ..
+cmake -DGLEW_INCLUDE_DIR=$PREFIX/include/ -DGLEW_LIBRARY=$PREFIX/lib/libGLEW.so ..
 make -j 4
+sudo make install
+cd ../..
