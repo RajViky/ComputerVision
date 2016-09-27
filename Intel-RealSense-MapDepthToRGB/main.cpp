@@ -48,7 +48,6 @@ int main() try
 
         // Retrieve our images
         const uint16_t * depth_image = (const uint16_t *)dev->get_frame_data(rs::stream::depth);
-        const uint8_t * color_image = (const uint8_t *)dev->get_frame_data(rs::stream::color);
 
         // Retrieve camera parameters for mapping between depth and color
         rs::intrinsics depth_intrin = dev->get_stream_intrinsics(rs::stream::depth);
@@ -58,9 +57,9 @@ int main() try
 
 
         char greyPixels[640 * 480];
-                for (unsigned int i = 0; i < 640 * 480; i++) {
-                     greyPixels[i] = 0x00;
-                }
+        for (unsigned int i = 0; i < 640 * 480; i++) {
+            greyPixels[i] = 0x00;
+        }
         for(int dy=0; dy<depth_intrin.height; ++dy)
         {
             for(int dx=0; dx<depth_intrin.width; ++dx)
@@ -78,18 +77,9 @@ int main() try
 
                 // Use the color from the nearest color pixel, or pure white if this point falls outside the color image
                 const int cx = (int)std::round(color_pixel.x), cy = (int)std::round(color_pixel.y);
-                if(cx < 0 || cy < 0 || cx >= color_intrin.width || cy >= color_intrin.height)
-                {
-                    // Skip over pixels with a depth value of zero, which is used to indicate no data
-                    if(depth_value == 0) continue;
-                        glColor3ub(255, 255, 255);
-                }
-                else
+                if(cx >= 0 && cy >= 0 && cx < color_intrin.width && cy < color_intrin.height)
                 {
                     greyPixels[cy*640+cx] = (char)(depth_in_meters * 128);
-                    // Skip over pixels with a depth value of zero, which is used to indicate no data
-                    if(depth_value == 0) continue;
-                        glColor3ubv(color_image + (cy * color_intrin.width + cx) * 3);
                 }
             }
         }
