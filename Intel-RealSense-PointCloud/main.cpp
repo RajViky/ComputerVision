@@ -1,9 +1,9 @@
 // License: Apache 2.0. See LICENSE file in root directory.
 // Copyright(c) 2015 Intel Corporation. All Rights Reserved.
 
-///////////////////////////////////////////////////////
-// librealsense tutorial #3 - Point cloud generation //
-///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+// librealsense tutorial #2 - Accessing multiple streams //
+///////////////////////////////////////////////////////////
 
 // First include the librealsense C++ header file
 #include <librealsense/rs.hpp>
@@ -12,6 +12,7 @@
 // Also include GLFW to allow for graphical display
 #define GLFW_INCLUDE_GLU
 #include <GLFW/glfw3.h>
+
 
 double yaw, pitch, lastX, lastY; int ml;
 static void on_mouse_button(GLFWwindow * win, int button, int action, int mods)
@@ -34,8 +35,6 @@ int main() try
 {
     // Turn on logging. We can separately enable logging to console or to file, and use different severity filters for each.
     rs::log_to_console(rs::log_severity::warn);
-    //rs::log_to_file(rs::log_severity::debug, "librealsense.log");
-
     // Create a context object. This object owns the handles to all connected realsense devices.
     rs::context ctx;
     printf("There are %d connected RealSense devices.\n", ctx.get_device_count());
@@ -54,12 +53,19 @@ int main() try
 
     // Open a GLFW window to display our output
     glfwInit();
-    GLFWwindow * win = glfwCreateWindow(1280, 960, "librealsense tutorial #3", nullptr, nullptr);
+    GLFWwindow * win = glfwCreateWindow(1280, 960, "PointCloud", nullptr, nullptr);
     glfwSetCursorPosCallback(win, on_cursor_pos);
     glfwSetMouseButtonCallback(win, on_mouse_button);
-    glfwMakeContextCurrent(win);
+    GLFWwindow * win2 = glfwCreateWindow(1280, 960, "Data for SLAM", nullptr, nullptr);
+
     while(!glfwWindowShouldClose(win))
     {
+        //FIRST
+        glfwMakeContextCurrent(win);
+        // Wait for new frame data
+        glfwPollEvents();
+        dev->wait_for_frames();
+
         // Wait for new frame data
         glfwPollEvents();
         dev->wait_for_frames();
@@ -92,6 +98,10 @@ int main() try
         glEnable(GL_DEPTH_TEST);
         glBegin(GL_POINTS);
 
+        char greyPixels[640 * 480];
+                for (unsigned int i = 0; i < 640 * 480; i++) {
+                     greyPixels[i] = 0x00;
+                }
         for(int dy=0; dy<depth_intrin.height; ++dy)
         {
             for(int dx=0; dx<depth_intrin.width; ++dx)
@@ -100,8 +110,6 @@ int main() try
                 uint16_t depth_value = depth_image[dy * depth_intrin.width + dx];
                 float depth_in_meters = depth_value * scale;
 
-                // Skip over pixels with a depth value of zero, which is used to indicate no data
-                if(depth_value == 0) continue;
 
                 // Map from pixel coordinates in the depth image to pixel coordinates in the color image
                 rs::float2 depth_pixel = {(float)dx, (float)dy};
@@ -113,11 +121,16 @@ int main() try
                 const int cx = (int)std::round(color_pixel.x), cy = (int)std::round(color_pixel.y);
                 if(cx < 0 || cy < 0 || cx >= color_intrin.width || cy >= color_intrin.height)
                 {
-                    glColor3ub(255, 255, 255);
+                    // Skip over pixels with a depth value of zero, which is used to indicate no data
+                    if(depth_value == 0) continue;
+                        glColor3ub(255, 255, 255);
                 }
                 else
                 {
-                    glColor3ubv(color_image + (cy * color_intrin.width + cx) * 3);
+                    greyPixels[cy*640+cx] = (char)(depth_in_meters * 128);
+                    // Skip over pixels with a depth value of zero, which is used to indicate no data
+                    if(depth_value == 0) continue;
+                        glColor3ubv(color_image + (cy * color_intrin.width + cx) * 3);
                 }
 
                 // Emit a vertex at the 3D location of this depth pixel
@@ -127,6 +140,41 @@ int main() try
         glEnd();
 
         glfwSwapBuffers(win);
+
+
+        //SECOND
+        glfwMakeContextCurrent(win2);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glPixelZoom(1, -1);
+
+        // Display depth data by linearly mapping depth between 0 and 2 meters to the red channel
+        glRasterPos2f(-1, 1);
+        glPixelTransferf(GL_RED_SCALE, 0xFFFF * dev->get_depth_scale() / 2.0f);
+        glDrawPixels(640, 480, GL_RED, GL_UNSIGNED_SHORT, dev->get_frame_data(rs::stream::depth));
+        glPixelTransferf(GL_RED_SCALE, 1.0f);
+
+
+//        char greyPixels[640 * 480];
+//        for (unsigned int i = 0; i < 640 * 480; i++) {
+//             greyPixels[i] = 0x60;
+//        }
+        glRasterPos2f(0, 0);
+        glDrawPixels(640, 480, GL_LUMINANCE, GL_UNSIGNED_BYTE, greyPixels);
+
+        // Display color image as RGB triples
+        glRasterPos2f(-1, 0);
+        glDrawPixels(640, 480, GL_RGB, GL_UNSIGNED_BYTE, dev->get_frame_data(rs::stream::color));
+        // Color - computed
+//        char pixels[640 * 480 * 3];
+//        for (unsigned int i = 0; i < 640 * 480 * 3; i+=3) {
+//            pixels[i + 0] = 0x00; // Red
+//            pixels[i + 1] = 0x00; // Green
+//            pixels[i + 2] = 0xff; // Blue
+//        }
+//        glRasterPos2f(0, 0);
+//        glDrawPixels(640, 480, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+        glfwSwapBuffers(win2);
     }
 
     return EXIT_SUCCESS;
