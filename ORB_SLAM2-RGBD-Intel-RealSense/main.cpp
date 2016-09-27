@@ -12,6 +12,12 @@
 
 #include<System.h>
 
+#include <librealsense/rs.hpp>
+#include <cstdio>
+
+//#define GLFW_INCLUDE_GLU
+//#include <GLFW/glfw3.h>
+
 int main( int argc, char *argv[] )
 {
     std::vector<std::string> arguments(argv + 1, argv + argc);

@@ -43,6 +43,9 @@ LIBS += -L/home/beda/data/skola/_Oulu/ORB_SLAM2/ORB_SLAM2/lib \
     -lDBoW2 \
     -L/home/beda/data/skola/_Oulu/ORB_SLAM2/ORB_SLAM2/Thirdparty/g2o/lib \
     -lg2o
+
+LIBS +=  -lrealsense -lglfw -lGL -lGLU -lusb
+
 QMAKE_RPATHDIR += /home/beda/data/skola/_Oulu/ORB_SLAM2/ORB_SLAM2/lib \
     /home/beda/data/skola/_Oulu/ORB_SLAM2/Pangolin/build/src \
     /home/beda/data/skola/_Oulu/ORB_SLAM2/ORB_SLAM2/Thirdparty/DBoW2/lib \
