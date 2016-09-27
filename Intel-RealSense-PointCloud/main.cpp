@@ -158,21 +158,21 @@ int main() try
 //        for (unsigned int i = 0; i < 640 * 480; i++) {
 //             greyPixels[i] = 0x60;
 //        }
-        glRasterPos2f(0, 0);
-        glDrawPixels(640, 480, GL_LUMINANCE, GL_UNSIGNED_BYTE, greyPixels);
+        glRasterPos2f(0, 1);
+        glDrawPixels(640, 480, GL_GREEN, GL_UNSIGNED_BYTE, greyPixels);
 
         // Display color image as RGB triples
         glRasterPos2f(-1, 0);
         glDrawPixels(640, 480, GL_RGB, GL_UNSIGNED_BYTE, dev->get_frame_data(rs::stream::color));
         // Color - computed
-//        char pixels[640 * 480 * 3];
-//        for (unsigned int i = 0; i < 640 * 480 * 3; i+=3) {
-//            pixels[i + 0] = 0x00; // Red
-//            pixels[i + 1] = 0x00; // Green
-//            pixels[i + 2] = 0xff; // Blue
-//        }
-//        glRasterPos2f(0, 0);
-//        glDrawPixels(640, 480, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+        char pixels[640 * 480 * 3];
+        for (unsigned int i = 0; i < 640 * 480 * 3; i+=3) {
+            pixels[i + 0] = 0x00; // Red
+            pixels[i + 1] = 0x00; // Green
+            pixels[i + 2] = 0xff; // Blue
+        }
+        glRasterPos2f(0, 0);
+        glDrawPixels(640, 480, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
         glfwSwapBuffers(win2);
     }
