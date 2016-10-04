@@ -1,20 +1,22 @@
 #!/usr/bin/sh
 #############
 #SUDO needs to be configured to work withou password
-#It isnt much safe so you can disable it after compilation
+#mount -t vboxsf -o uid=1000,gid=1000 data /mnt/host
+#guest ALL=(ALL) NOPASSWD:ALL
+#It isnt much safe so you should disable it after compilation
 ############
 #Needs subversion (with dependencies) and git modules
 ############
 
-export PREFIX=/opt/playground
+export PREFIX=/opt/playground/usr
 #Place new things over the system
 #GCC
 #svn checkout svn://gcc.gnu.org/svn/gcc/branches/gcc-6-branch/ gcc
 #mkdir gccobj
 #cd gccobj
 #../gcc/configure --enable-languages=c,c++,fortran \
-    --prefix=$PREFIX \
-    --disable-multilib
+#    --prefix=$PREFIX \
+#    --disable-multilib
 #    --with-system-zlib
 #    --with-default-libstdcxx-abi=gcc4-compatible
 #make bootstrap MAKE="make -j 4"
@@ -76,6 +78,7 @@ make
 sudo cp -R ./bin/* $PREFIX/bin/
 sudo cp -R ./include/* $PREFIX/include/
 sudo cp -R ./lib/* $PREFIX/lib/
+sudo mkdir $PREFIX/lib64
 sudo cp -R ./lib/* $PREFIX/lib64/ 
 cd ..
 
@@ -86,7 +89,7 @@ cd boost_1_61_0
 ./bootstrap.sh --prefix=$PREFIX
 ./b2
 sudo ./b2 install --prefix=$PREFIX
-cd..
+cd ..
 
 #LAPACK
 #GET FROM USM -> with dependencies
@@ -102,12 +105,16 @@ make
 sudo make install
 cd ../..
 
+##################################################
+#Cannot get paths working for pangolin -> creat package from /opt/playgroud, activate it and proceed
+
+
 #Pangloin
 git clone https://github.com/stevenlovegrove/Pangolin.git
 cd Pangolin
 mkdir build
 cd build
-cmake -DGLEW_INCLUDE_DIR=$PREFIX/include/ -DGLEW_LIBRARY=$PREFIX/lib/libGLEW.so ..
+cmake -DGLEW_INCLUDE_DIR=$PREFIX/include/ -DGLEW_LIBRARY=$PREFIX/lib/libGLEW.so -D CMAKE_INSTALL_PREFIX=$PREFIX  ..
 make -j 4
 sudo make install
 cd ../..
