@@ -5,9 +5,7 @@ CONFIG -= qt
 
 SOURCES += main.cpp
 
-#DEFINES += COMPILEDWITHC11
-
-INCLUDEPATH += /home/beda/data/skola/_Oulu/PCL-libRealSense/pkg/pcl-librealsense-git/usr/include/pcl-1.8 \
+INCLUDEPATH += /usr/include/pcl-1.8 \
     /usr/include/eigen3 \
     /usr/include/vtk/
 
@@ -18,4 +16,4 @@ LIBS += -lboost_system \
     -lpcl_visualization
 
 
-QMAKE_RPATHDIR += /home/beda/data/skola/_Oulu/PCL-libRealSense/pkg/pcl-librealsense-git/usr/lib
+#QMAKE_RPATHDIR += /home/beda/data/skola/_Oulu/PCL-libRealSense/pkg/pcl-librealsense-git/usr/lib
