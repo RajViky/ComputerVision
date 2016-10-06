@@ -6,6 +6,7 @@
 #It isnt much safe so you should disable it after compilation
 ############
 #Needs subversion (with dependencies) and git modules
+#JDK
 ############
 
 export PREFIX=/opt/playground/usr
@@ -118,3 +119,4 @@ cmake -DGLEW_INCLUDE_DIR=$PREFIX/include/ -DGLEW_LIBRARY=$PREFIX/lib/libGLEW.so 
 make -j 4
 sudo make install
 cd ../..
+
