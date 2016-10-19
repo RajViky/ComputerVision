@@ -418,7 +418,6 @@ cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX
 make -j5
 sudo make install DESTDIR=$DESTDIR
 
-
 cmake .. \
       -DCMAKE_INSTALL_PREFIX=$PREFIX \
       -DBUILD_DOCUMENTATION=OFF \

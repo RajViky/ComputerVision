@@ -12,6 +12,7 @@ INCLUDEPATH += /usr/include/pcl-1.8 \
 LIBS += -lboost_system \
     -lboost_thread \
     -L/home/beda/data/skola/_Oulu/PCL-libRealSense/pkg/pcl-librealsense-git/usr/lib \
+    -lvtkCommonCore \
     -lpcl_common \
     -lpcl_filters \
     -lpcl_io \
