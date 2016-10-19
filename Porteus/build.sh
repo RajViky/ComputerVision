@@ -389,19 +389,19 @@ sudo /opt/porteus-scripts/deactivate /opt/prereq5.xzm
 sudo dir2xzm $DESTDIR /mnt/sda1/porteus/modules/mesa.xzm
 sudo /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/mesa.xzm
 
-# export DESTDIR=/opt/opencv2
-# #OpenCV 2.4.13
-# wget http://github.com/Itseez/opencv/archive/2.4.13.zip --no-check-certificate
-# unzip 2.4.13.zip
-# cd opencv-2.4.13
-# mkdir release
-# cd release
-# cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=$PREFIX cmake -DENABLE_PRECOMPILED_HEADERS=OFF ..
-# make -j5
-# sudo make install DESTDIR=$DESTDIR
-# cd ../..
-# sudo dir2xzm $DESTDIR /mnt/sda1/porteus/modules/opencv2.xzm
-# sudo /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/opencv2.xzm
+ export DESTDIR=/opt/opencv2
+ #OpenCV 2.4.13
+ wget http://github.com/Itseez/opencv/archive/2.4.13.zip --no-check-certificate
+ unzip 2.4.13.zip
+ cd opencv-2.4.13
+ mkdir release
+ cd release
+ cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=$PREFIX cmake -DENABLE_PRECOMPILED_HEADERS=OFF -DLIB_SUFFIX=64 ..
+ make -j5
+ sudo make install DESTDIR=$DESTDIR
+ cd ../..
+ sudo dir2xzm $DESTDIR /mnt/sda1/porteus/modules/opencv2.xzm
+ sudo /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/opencv2.xzm
 
 
 export DESTDIR=/opt/rtabmap
@@ -411,6 +411,9 @@ export PATH=$DESTDIR/$PREFIX/usr/bin:$PATH
 export INCLUDE_PATH=/usr/include/eigen3:$INCLUDE_PATH
 export LIBRARY_PATH=$DESTDIR/$LIBDIR:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$DESTDIR/$LIBDIR:$LD_LIBRARY_PATH
+
+#MOVE TO APPROPRIATE PLACE - where eigen is built!
+sudo ln -s /usr/include/eigen3/* /usr/include/
 
 git clone https://github.com/introlab/rtabmap.git rtabmap
 cd rtabmap/build
