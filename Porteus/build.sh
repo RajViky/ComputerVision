@@ -247,7 +247,10 @@ cmake .. \
       -DVTK_WRAP_TCL=ON \
       -DVTK_USE_SYSTEM_LIBRARIES=ON \
       -DVTK_USE_SYSTEM_GL2PS=OFF \
-      -DVTK_USE_SYSTEM_HDF5=ON
+      -DVTK_USE_SYSTEM_HDF5=ON \
+      -DModule_vtkGUISupportQtOpenGL:BOOL=ON \
+      -DModule_vtkGUISupportQt:BOOL=ON \
+      -DVTK_Group_Qt:BOOL=ON
 make -j5
 sudo make install DESTDIR=$DESTDIR
 cd ../..  
@@ -389,19 +392,21 @@ sudo /opt/porteus-scripts/deactivate /opt/prereq5.xzm
 sudo dir2xzm $DESTDIR /mnt/sda1/porteus/modules/mesa.xzm
 sudo /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/mesa.xzm
 
- export DESTDIR=/opt/opencv2
- #OpenCV 2.4.13
- wget http://github.com/Itseez/opencv/archive/2.4.13.zip --no-check-certificate
- unzip 2.4.13.zip
- cd opencv-2.4.13
- mkdir release
- cd release
- cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=$PREFIX cmake -DENABLE_PRECOMPILED_HEADERS=OFF -DLIB_SUFFIX=64 ..
- make -j5
- sudo make install DESTDIR=$DESTDIR
- cd ../..
- sudo dir2xzm $DESTDIR /mnt/sda1/porteus/modules/opencv2.xzm
- sudo /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/opencv2.xzm
+
+#Probably needs to be moved forward!!!!!!!!!!!!!!!!!!!!!
+export DESTDIR=/opt/opencv2
+#OpenCV 2.4.13
+wget http://github.com/Itseez/opencv/archive/2.4.13.zip --no-check-certificate
+unzip 2.4.13.zip
+cd opencv-2.4.13
+mkdir release
+cd release
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=$PREFIX cmake -DENABLE_PRECOMPILED_HEADERS=OFF -DLIB_SUFFIX=64 ..
+make -j5
+sudo make install DESTDIR=$DESTDIR
+cd ../..
+sudo dir2xzm $DESTDIR /mnt/sda1/porteus/modules/opencv2.xzm
+sudo /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/opencv2.xzm
 
 
 export DESTDIR=/opt/rtabmap
@@ -421,64 +426,5 @@ cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX
 make -j5
 sudo make install DESTDIR=$DESTDIR
 
-cmake .. \
-      -DCMAKE_INSTALL_PREFIX=$PREFIX \
-      -DBUILD_DOCUMENTATION=OFF \
-      -DBUILD_SHARED_LIBS=ON \
-      -DBUILD_TESTING=OFF \
-      -DVTK_LEGACY_REMOVE=ON \
-      -DVTK_USE_CXX11_FEATURES=OFF \
-      -DVTK_USE_LARGE_DATA=ON \
-      -DVTK_USE_SYSTEM_LIBPROJ4=OFF \
-      -DVTK_USE_SYSTEM_XDMF3=OFF \
-      -DModule_vtkIOFFMPEG=ON \
-      -DModule_vtkIOGDAL=ON \
-      -DModule_vtkxdmf3=ON \
-      -DModule_vtkIOXdmf3=ON \
-      -DVTK_WRAP_JAVA=OFF \
-      -DVTK_WRAP_PYTHON=OFF \
-      -DVTK_WRAP_TCL=ON \
-      -DVTK_USE_SYSTEM_LIBRARIES=ON \
-      -DVTK_USE_SYSTEM_GL2PS=OFF \
-      -DVTK_USE_SYSTEM_HDF5=ON \
-      -DModule_vtkGUISupportQtOpenGL:BOOL=ON \
-      -DModule_vtkGUISupportQt:BOOL=ON \
-      -DVTK_Group_Qt:BOOL=ON
-make -j5
-sudo make install DESTDIR=$DESTDIR
-sudo dir2xzm $DESTDIR /mnt/sda1/porteus/modules/mesa.xzm
-#VTK
-cmake .. \
-      -DCMAKE_INSTALL_PREFIX=$PREFIX/usr \
-      -DBUILD_DOCUMENTATION=OFF \
-      -DBUILD_SHARED_LIBS=ON \
-      -DBUILD_TESTING=OFF \
-      -DVTK_LEGACY_REMOVE=ON \
-      -DVTK_USE_CXX11_FEATURES=OFF \
-      -DVTK_USE_LARGE_DATA=ON \
-      -DVTK_USE_SYSTEM_LIBPROJ4=OFF \
-      -DVTK_USE_SYSTEM_XDMF3=OFF \
-      -DModule_vtkIOFFMPEG=ON \
-      -DModule_vtkIOGDAL=ON \
-      -DModule_vtkxdmf3=ON \
-      -DModule_vtkIOXdmf3=ON \
-      -DVTK_WRAP_JAVA=OFF \
-      -DVTK_WRAP_PYTHON=ON \
-      -DVTK_WRAP_TCL=ON \
-      -DVTK_USE_SYSTEM_LIBRARIES=ON \
-      -DVTK_USE_SYSTEM_GL2PS=OFF \
-      -DVTK_USE_SYSTEM_HDF5=ON \
-      -DQT_QMAKE_EXECUTABLE:PATH=/usr/bin/qmake \
-      -DVTK_Group_Qt:BOOL=ON \
-      -DVTK_USE_FFMPEG_ENCODER:BOOL=ON  \
-      -DModule_vtkGUISupportQtWebkit:BOOL=ON \
-      -DModule_vtkRenderingOpenGL2:BOOL=ON \
-      -DModule_vtkFiltersParallelFlowPaths:BOOL=ON \
-      -DModule_vtkParallelMPI:BOOL=ON \
-      -DModule_vtkFiltersParallelGeometry:BOOL=ON \
-      -DModule_vtkFiltersParallelMPI:BOOL=ON \
-      -DModule_vtkFiltersParallelStatistics:BOOL=ON \
-      -DModule_vtkFiltersPython:BOOL=ON \
-      -DModule_vtkFiltersReebGraph:BOOL=ON \
-      -DModule_vtkGUISupportQtOpenGL:BOOL=ON \
-      -DModule_vtkWrappingPythonCore:BOOL=OFF
+sudo dir2xzm $DESTDIR /mnt/sda1/porteus/modules/rtabmap.xzm
+sudo /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/rtabmap.xzm
