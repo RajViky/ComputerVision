@@ -1,2 +1,2 @@
 # ComputerVision
-Collection of programs and script with ORB_SLAM2, OpenCV and similar
+Collection of test programs and scripts for Robot vision with PCL, ORB_SLAM2, OpenCV...
