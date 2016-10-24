@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 2.8)
+SET(RTABMap_DIR "/opt/rtabmap/lib/rtabmap-0.11")
+
+PROJECT( RTAB-map-cpp )
+
+FIND_PACKAGE(RTABMap REQUIRED)
+FIND_PACKAGE(OpenCV REQUIRED)
+FIND_PACKAGE(PCL 1.7 REQUIRED)
+
+FIND_PACKAGE(Qt5 COMPONENTS Widgets Core Gui Svg QUIET)
+
+SET(INCLUDE_DIRS
+    ${RTABMap_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
+    )
+
+SET(LIBRARIES
+    ${RTABMap_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    ${QT_LIBRARIES}
+    ${PCL_LIBRARIES}
+    )
+
+INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
+
+QT5_WRAP_CPP(moc_srcs MapBuilder.h)
+
+ADD_EXECUTABLE(rgbd_mapping main.cpp ${moc_srcs})
+
+TARGET_LINK_LIBRARIES(rgbd_mapping ${LIBRARIES})
