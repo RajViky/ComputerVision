@@ -137,7 +137,8 @@ protected slots:
 					4.0f); // max depth
 				if(cloud->size())
 				{
-					if(!cloudViewer_->addCloud("cloudOdom", cloud, odometryCorrection_*pose))
+                                    //NEW CLOUD
+                                        if(!cloudViewer_->addCloud("cloudOdom", cloud, odometryCorrection_*pose))
 					{
 						UERROR("Adding cloudOdom to viewer failed!");
 					}
@@ -176,42 +177,48 @@ protected slots:
 			{
 				std::string cloudName = uFormat("cloud%d", iter->first);
 
-				// 3d point cloud
-				if(clouds.contains(cloudName))
-				{
-					// Update only if the pose has changed
-					Transform tCloud;
-					cloudViewer_->getPose(cloudName, tCloud);
-					if(tCloud.isNull() || iter->second != tCloud)
-					{
-						if(!cloudViewer_->updateCloudPose(cloudName, iter->second))
-						{
-							UERROR("Updating pose cloud %d failed!", iter->first);
-						}
-					}
-					cloudViewer_->setCloudVisibility(cloudName, true);
-				}
-				else if(uContains(stats.getSignatures(), iter->first))
-				{
-					Signature s = stats.getSignatures().at(iter->first);
-					s.sensorData().uncompressData(); // make sure data is uncompressed
-					// Add the new cloud
-					pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = util3d::cloudRGBFromSensorData(
-							s.sensorData(),
-						    4,     // decimation
-						    4.0f); // max depth
-					if(cloud->size())
-					{
-						if(!cloudViewer_->addCloud(cloudName, cloud, iter->second))
-						{
-							UERROR("Adding cloud %d to viewer failed!", iter->first);
-						}
-					}
-					else
-					{
-						UWARN("Empty cloud %d!", iter->first);
-					}
-				}
+                                //NEW CLOUD
+                                // 3d point cloud
+                                if(clouds.contains(cloudName))
+                                {
+                                    std::cout << "UPDATE" << std::endl;
+                                        // Update only if the pose has changed
+                                        Transform tCloud;
+                                        cloudViewer_->getPose(cloudName, tCloud);
+                                        if(tCloud.isNull() || iter->second != tCloud)
+                                        {
+                                                if(!cloudViewer_->updateCloudPose(cloudName, iter->second))
+                                                {
+                                                        UERROR("Updating pose cloud %d failed!", iter->first);
+                                                }
+                                        }
+                                        cloudViewer_->setCloudVisibility(cloudName, true);
+                                }
+                                //OLD clouds
+                                else
+                                if(uContains(stats.getSignatures(), iter->first))
+                                {
+                                        Signature s = stats.getSignatures().at(iter->first);
+                                        s.sensorData().uncompressData(); // make sure data is uncompressed
+                                        // Add the new cloud
+                                        pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = util3d::cloudRGBFromSensorData(
+                                                        s.sensorData(),
+                                                    4,     // decimation
+                                                    4.0f); // max depth
+
+                                        if(cloud->size())
+                                        {
+                                            std::cout << "NEW, total " << poses.size() << " clouds" << std::endl;
+                                                if(!cloudViewer_->addCloud(cloudName, cloud, iter->second))
+                                                {
+                                                        UERROR("Adding cloud %d to viewer failed!", iter->first);
+                                                }
+                                        }
+                                        else
+                                        {
+                                                UWARN("Empty cloud %d!", iter->first);
+                                        }
+                                }
 			}
 			else
 			{
@@ -237,16 +244,16 @@ protected slots:
 
 
 			// add graph
-			cloudViewer_->addOrUpdateGraph("graph", graph, Qt::gray);
-			cloudViewer_->addCloud("graph_nodes", graphNodes, Transform::getIdentity(), Qt::green);
-			cloudViewer_->setCloudPointSize("graph_nodes", 5);
+                        cloudViewer_->addOrUpdateGraph("graph", graph, Qt::gray);
+                        cloudViewer_->addCloud("graph_nodes", graphNodes, Transform::getIdentity(), Qt::green);
+                        cloudViewer_->setCloudPointSize("graph_nodes", 5);
 		}
 
 		odometryCorrection_ = stats.mapCorrection();
 
 		cloudViewer_->update();
 
-		processingStatistics_ = false;
+                processingStatistics_ = false;
 	}
 
 	virtual void handleEvent(UEvent * event)

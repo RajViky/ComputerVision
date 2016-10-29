@@ -21,6 +21,7 @@
 
 
 #include <pcl/io/lzf_image_io.h>
+#include <pcl/io/pcd_io.h>
 
 using namespace cv;
 using namespace std;
@@ -219,6 +220,7 @@ int main()
 
     /// [loop start]
     pcl::visualization::CloudViewer viewer("Viewer");
+    pcl::PointCloud<pcl::PointXYZ>::Ptr data;
 
     while(!protonect_shutdown && (framemax == (size_t)-1 || framecount < framemax))
     {
@@ -268,7 +270,7 @@ int main()
         //pcl::PointCloud<pcl::PointXYZ>::Ptr test = MatToPoinXYZ(newMat);
 
         cv::Mat newMat = imread( "/tmp/test.png",CV_LOAD_IMAGE_ANYDEPTH);
-        pcl::PointCloud<pcl::PointXYZ>::Ptr test = Mat16UToPoinXYZ(newMat);
+        data = Mat16UToPoinXYZ(newMat);
 
         //pcl::PointCloud<pcl::PointXYZ>::Ptr test = Mat32FToPoinXYZ(undistortedMat);
 //        pcl::PointCloud<pcl::PointXYZ> test1;
@@ -276,12 +278,15 @@ int main()
 //        pcl::io::LZFDepth16ImageReader reader;
 //        reader.read(f,test1);
 //        pcl::PointCloud<pcl::PointXYZ>::Ptr test(&test1);
-        viewer.showCloud(test);
+        viewer.showCloud(data);
 
         listener.release(frames);
     }
     dev->stop();
     dev->close();
+
+    pcl::PCDWriter writer;
+    writer.write ("/tmp/test.pcd", *data, false);
 
     delete registration;
 

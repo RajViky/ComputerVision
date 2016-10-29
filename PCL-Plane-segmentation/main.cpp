@@ -86,7 +86,6 @@ main ()
         pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_colorG(cloud_p, 0, 255, 0);
         viewer.addPointCloud<pcl::PointXYZ> (cloud_p, single_colorG,"p"+i);
     }
-    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_colorR(cloud_f, 255, 0, 0);
 
     viewer.setBackgroundColor (0, 0, 0);
     viewer.addCoordinateSystem (1.0);
