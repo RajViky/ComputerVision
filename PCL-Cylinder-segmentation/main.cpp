@@ -9,6 +9,7 @@
 #include <pcl/segmentation/sac_segmentation.h>
 
 #include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/filters/voxel_grid.h>
 typedef pcl::PointXYZ PointT;
 
 int
@@ -26,6 +27,7 @@ main ()
 
     // Datasets
     pcl::PointCloud<PointT>::Ptr cloud (new pcl::PointCloud<PointT>);
+    pcl::PointCloud<PointT>::Ptr cloud2 (new pcl::PointCloud<PointT>);
     pcl::PointCloud<PointT>::Ptr cloud_filtered (new pcl::PointCloud<PointT>);
     pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
     pcl::PointCloud<PointT>::Ptr cloud_filtered2 (new pcl::PointCloud<PointT>);
@@ -34,16 +36,24 @@ main ()
     pcl::PointIndices::Ptr inliers_plane (new pcl::PointIndices), inliers_cylinder (new pcl::PointIndices);
 
     // Read in the cloud data
-    //reader.read ("../PCL-Cylinder-segmentation/table_scene_mug_stereo_textured.pcd", *cloud);
-    reader.read ("/tmp/test.pcd", *cloud);
+    reader.read ("../PCL-Cylinder-segmentation/hrnek.pcd", *cloud);
+    //reader.read ("/tmp/test.pcd", *cloud);
     std::cerr << "PointCloud has: " << cloud->points.size () << " data points." << std::endl;
 
     // Build a passthrough filter to remove spurious NaNs
     pass.setInputCloud (cloud);
     pass.setFilterFieldName ("z");
-    pass.setFilterLimits (0, 1.5);
+    pass.setFilterLimits (0.01, 1.5);
     pass.filter (*cloud_filtered);
     std::cerr << "PointCloud after filtering has: " << cloud_filtered->points.size () << " data points." << std::endl;
+
+
+
+//    pcl::VoxelGrid<pcl::PointXYZ> sor;
+//    sor.setInputCloud (cloud2);
+//    sor.setLeafSize (0.002f, 0.002f, 0.002f);
+//    sor.filter (*cloud_filtered);
+
 
     // Estimate point normals
     ne.setSearchMethod (tree);

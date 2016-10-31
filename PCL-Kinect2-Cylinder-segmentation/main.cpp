@@ -204,6 +204,7 @@ int main()
         pcl::search::KdTree<pcl::PointXYZRGBA>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBA> ());
 
         // Datasets
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGBA>);
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGBA>);
         pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_filtered2 (new pcl::PointCloud<pcl::PointXYZRGBA>);
@@ -214,9 +215,15 @@ int main()
         // Build a passthrough filter to remove spurious NaNs
         pass.setInputCloud (data);
         pass.setFilterFieldName ("z");
-        pass.setFilterLimits (0, 1.5);
-        pass.filter (*cloud_filtered);
-        std::cerr << "PointCloud after filtering has: " << cloud_filtered->points.size () << " data points." << std::endl;
+        pass.setFilterLimits (0.1, 1.5);
+        pass.filter (*cloud);
+        //std::cerr << "PointCloud after filtering has: " << cloud_filtered->points.size () << " data points." << std::endl;
+
+            pcl::VoxelGrid<pcl::PointXYZRGBA> sor;
+            sor.setInputCloud (cloud);
+            sor.setLeafSize (0.002f, 0.002f, 0.002f);
+            sor.filter (*cloud_filtered);
+
 
         // Estimate point normals
         ne.setSearchMethod (tree);
@@ -235,57 +242,58 @@ int main()
         seg.setInputNormals (cloud_normals);
         // Obtain the plane inliers and coefficients
         seg.segment (*inliers_plane, *coefficients_plane);
-        std::cerr << "Plane coefficients: " << *coefficients_plane << std::endl;
+        //std::cerr << "Plane coefficients: " << *coefficients_plane << std::endl;
 
-//        // Extract the planar inliers from the input cloud
-//        extract.setInputCloud (cloud_filtered);
-//        extract.setIndices (inliers_plane);
-//        extract.setNegative (false);
+        // Extract the planar inliers from the input cloud
+        extract.setInputCloud (cloud_filtered);
+        extract.setIndices (inliers_plane);
+        extract.setNegative (false);
 
-//        // Write the planar inliers to disk
-//        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGBA> ());
-//        extract.filter (*cloud_plane);
+        // Write the planar inliers to disk
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGBA> ());
+        extract.filter (*cloud_plane);
 
-//        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZRGBA> single_colorG(cloud_plane, 0, 255, 0);
-//        viewer.addPointCloud<pcl::PointXYZRGBA> (cloud_plane, single_colorG,"planes");
+        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZRGBA> single_colorG(cloud_plane, 0, 255, 0);
+        viewer.addPointCloud<pcl::PointXYZRGBA> (cloud_plane, single_colorG,"planes");
 
-//        // Remove the planar inliers, extract the rest
-//        extract.setNegative (true);
-//        extract.filter (*cloud_filtered2);
-//        extract_normals.setNegative (true);
-//        extract_normals.setInputCloud (cloud_normals);
-//        extract_normals.setIndices (inliers_plane);
-//        extract_normals.filter (*cloud_normals2);
+        // Remove the planar inliers, extract the rest
+        extract.setNegative (true);
+        extract.filter (*cloud_filtered2);
+        extract_normals.setNegative (true);
+        extract_normals.setInputCloud (cloud_normals);
+        extract_normals.setIndices (inliers_plane);
+        extract_normals.filter (*cloud_normals2);
 
-//        // Create the segmentation object for cylinder segmentation and set all the parameters
-//        seg.setOptimizeCoefficients (true);
-//        seg.setModelType (pcl::SACMODEL_CYLINDER);
-//        seg.setMethodType (pcl::SAC_RANSAC);
-//        seg.setNormalDistanceWeight (0.1);
-//        seg.setMaxIterations (10000);
-//        seg.setDistanceThreshold (0.05);
-//        seg.setRadiusLimits (0, 0.1);
-//        seg.setInputCloud (cloud_filtered2);
-//        seg.setInputNormals (cloud_normals2);
+        // Create the segmentation object for cylinder segmentation and set all the parameters
+        seg.setOptimizeCoefficients (true);
+        seg.setModelType (pcl::SACMODEL_CYLINDER);
+        seg.setMethodType (pcl::SAC_RANSAC);
+        seg.setNormalDistanceWeight (0.1);
+        seg.setMaxIterations (10000);
+        seg.setDistanceThreshold (0.05);
+        seg.setRadiusLimits (0, 0.1);
+        seg.setInputCloud (cloud_filtered2);
+        seg.setInputNormals (cloud_normals2);
 
-//        // Obtain the cylinder inliers and coefficients
-//        seg.segment (*inliers_cylinder, *coefficients_cylinder);
-//        std::cerr << "Cylinder coefficients: " << *coefficients_cylinder << std::endl;
+        // Obtain the cylinder inliers and coefficients
+        seg.segment (*inliers_cylinder, *coefficients_cylinder);
+        //std::cerr << "Cylinder coefficients: " << *coefficients_cylinder << std::endl;
 
-//        // Write the cylinder inliers to disk
-//        extract.setInputCloud (cloud_filtered2);
-//        extract.setIndices (inliers_cylinder);
-//        extract.setNegative (false);
-//        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_cylinder (new pcl::PointCloud<pcl::PointXYZRGBA> ());
-//        extract.filter (*cloud_cylinder);
-//        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZRGBA> single_colorR(cloud_cylinder, 255, 0, 0);
-//        viewer.addPointCloud<pcl::PointXYZRGBA> (cloud_cylinder, single_colorR,"cylinder");
+        // Write the cylinder inliers to disk
+        extract.setInputCloud (cloud_filtered2);
+        extract.setIndices (inliers_cylinder);
+        extract.setNegative (false);
+
+        viewer.addPointCloud<pcl::PointXYZRGBA> (cloud_filtered2, "sample cloud");
+
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_cylinder (new pcl::PointCloud<pcl::PointXYZRGBA> ());
+        extract.filter (*cloud_cylinder);
+        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZRGBA> single_colorR(cloud_cylinder, 255, 0, 0);
+        viewer.addPointCloud<pcl::PointXYZRGBA> (cloud_cylinder, single_colorR,"cylinder");
 
 
         viewer.setBackgroundColor (0, 0, 0);
         viewer.addCoordinateSystem (1.0);
-
-        viewer.addPointCloud<pcl::PointXYZRGBA> (cloud_filtered, "sample cloud");
 
         viewer.spinOnce();
 
