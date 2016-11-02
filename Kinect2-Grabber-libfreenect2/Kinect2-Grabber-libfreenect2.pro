@@ -6,11 +6,12 @@ CONFIG -= qt
 SOURCES += main.cpp
 
 LIBS += -lfreenect2 \
-    -lglfw -lGL -lGLU -lusb
-
-INCLUDEPATH += /opt/opencv3/include
-
-LIBS += -L/opt/opencv3/lib \
+    -lglfw -lGL -lGLU -lusb \
+    -lboost_system \
+    -lboost_thread \
+    -lboost_filesystem \
+    -lboost_date_time \
+    -L/opt/opencv3/lib \
     -lopencv_videostab \
     -lopencv_superres \
     -lopencv_stitching \
@@ -27,22 +28,5 @@ LIBS += -L/opt/opencv3/lib \
     -lopencv_videoio \
     -lopencv_imgproc \
     -lopencv_imgcodecs
-
-INCLUDEPATH += /usr/include/pcl-1.8 \
-    /usr/include/eigen3 \
-    /usr/include/vtk/
-
-LIBS += -lboost_system \
-    -lboost_thread \
-    -L/home/beda/data/skola/_Oulu/PCL-libRealSense/pkg/pcl-librealsense-git/usr/lib \
-    -lvtkCommonCore \
-    -lpcl_common \
-    -lpcl_filters \
-    -lpcl_io \
-    -lpcl_visualization \
-    -lpcl_segmentation \
-    -lboost_filesystem \
-    -lboost_date_time
-
 
 QMAKE_RPATHDIR += /opt/opencv3/lib

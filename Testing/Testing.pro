@@ -45,4 +45,5 @@ LIBS += -lboost_system \
     -lpcl_visualization \
     -lpcl_segmentation \
     -lpcl_search \
-    -lpcl_features
+    -lpcl_features \
+    -lboost_date_time

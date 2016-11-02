@@ -222,6 +222,19 @@ int main()
     pcl::visualization::CloudViewer viewer("Viewer");
     pcl::PointCloud<pcl::PointXYZ>::Ptr data;
 
+
+    std::string dir = "/tmp/images";
+    boost::filesystem::path path = dir;
+    if ( exists( path ) )
+    {
+        boost::filesystem::remove_all(path);
+    }
+    if (!boost::filesystem::create_directories(path / "rgb")
+            || !boost::filesystem::create_directories(path / "depth")
+            || !boost::filesystem::create_directories(path / "orig_rgb")
+            || !boost::filesystem::create_directories(path / "pcd"))
+        std::cout << "Cannot create tmp UNI DIR" << std::endl;
+
     while(!protonect_shutdown && (framemax == (size_t)-1 || framecount < framemax))
     {
         if (!listener.waitForNewFrame(frames, 10*1000)) // 10 sconds
@@ -252,14 +265,23 @@ int main()
         cv::Mat(registered.height, registered.width, CV_8UC4, registered.data).copyTo(registeredMat);
 
 
-        imwrite( "/tmp/rgbMat.png", rgbMat );
-        imwrite( "/tmp/depthMat.png", depthMat );
-        cv::Mat aaa;
-        undistortedMat.convertTo(aaa, CV_16UC1);
-        //undistortedMat.convertTo(aaa, CV_8UC1);
-        imwrite( "/tmp/undistortedMat.png", undistortedMat );
-        imwrite( "/tmp/test.png", aaa );
-        imwrite( "/tmp/registeredMat.png", registeredMat );
+        boost::posix_time::ptime epoch = boost::posix_time::time_from_string("1970-01-01 00:00:00.000");
+        boost::posix_time::ptime t1 = boost::posix_time::microsec_clock::local_time();
+        double diff = (t1-epoch).total_milliseconds()/1000.0;
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(4) << diff;
+        std::string time = ss.str();
+
+
+        cv::Mat mirror;
+        cv::Mat converted;
+        undistortedMat.convertTo(converted, CV_16UC1);
+        cv::flip(converted,mirror,1);
+        imwrite( dir +"/depth/"+time+".png", mirror );
+        cv::flip(registeredMat,mirror,1);
+        imwrite( dir +"/rgb/"+time+".png", mirror );
+        cv::flip(rgbMat,mirror,1);
+        imwrite( dir +"/orig_rgb/"+time+".jpg", mirror );
 
 
         //cv::Mat newMat = imread( "/tmp/test.png",0);
@@ -269,8 +291,8 @@ int main()
 
         //pcl::PointCloud<pcl::PointXYZ>::Ptr test = MatToPoinXYZ(newMat);
 
-        cv::Mat newMat = imread( "/tmp/test.png",CV_LOAD_IMAGE_ANYDEPTH);
-        data = Mat16UToPoinXYZ(newMat);
+        //cv::Mat newMat = imread( "/tmp/test.png",CV_LOAD_IMAGE_ANYDEPTH);
+        data = Mat16UToPoinXYZ(converted);
 
         //pcl::PointCloud<pcl::PointXYZ>::Ptr test = Mat32FToPoinXYZ(undistortedMat);
 //        pcl::PointCloud<pcl::PointXYZ> test1;
