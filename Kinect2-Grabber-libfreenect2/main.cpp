@@ -96,6 +96,7 @@ int main()
     if (!boost::filesystem::create_directories(path / "rgb")
             || !boost::filesystem::create_directories(path / "depth")
             || !boost::filesystem::create_directories(path / "orig_rgb")
+            || !boost::filesystem::create_directories(path / "depth_mat")
             || !boost::filesystem::create_directories(path / "pcd"))
         std::cout << "Cannot create tmp UNI DIR" << std::endl;
 
@@ -153,9 +154,16 @@ int main()
         imwrite( dir +"/rgb/tmp-rgb.png", mirror );
         cv::flip(rgbMat,mirror,1);
         imwrite( dir +"/orig_rgb/tmp-orig_rgb.jpg", mirror );
+        cv::flip(undistortedMat,mirror,1);
+        mirror /= 1000;
+        cv::FileStorage file( dir +"/depth_mat/tmp-depth_mat.xml", cv::FileStorage::WRITE);
+        file << "depth_mat" << mirror;
+        file.release();
+
         boost::filesystem::rename(dir +"/depth/tmp-depth.png",dir +"/depth/depth.png");
         boost::filesystem::rename(dir +"/rgb/tmp-rgb.png",dir +"/rgb/rgb.png");
         boost::filesystem::rename(dir +"/orig_rgb/tmp-orig_rgb.jpg",dir +"/orig_rgb/orig_rgb.jpg");
+        boost::filesystem::rename(dir +"/depth_mat/tmp-depth_mat.xml",dir +"/depth_mat/depth_mat.xml");
         //usleep(500);
 
 
