@@ -29,4 +29,4 @@ LIBS += -lfreenect2 \
     -lopencv_imgproc \
     -lopencv_imgcodecs
 
-QMAKE_RPATHDIR += /opt/opencv3/lib
+QMAKE_RPATHDIR += ./
