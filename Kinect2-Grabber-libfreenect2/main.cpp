@@ -14,7 +14,9 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/date_time.hpp>
 
 using namespace cv;
@@ -87,6 +89,7 @@ int main(int argc, char **argv)
     {
         std::cout << "Kinect 2 image grabber" << std::endl;
         std::cout << "======================" << std::endl;
+        std::cout << "Program should be closed with Ctrl+C" << std::endl;
         std::cout << "Available Parameters:" << std::endl;
         std::cout << "-dir          -dir=/tmp/grabber" << std::endl;
         std::cout << "     Base tmp directory where data is stored." << std::endl;
@@ -154,7 +157,7 @@ int main(int argc, char **argv)
     }
     catch(std::exception e)
     {
-        std::cout << "Cannto create required directories, exit." << std::endl;
+        std::cout << "Cannot create required directories, exit." << std::endl;
         std::cout << e.what() << std::endl;
         return -1;
     }
