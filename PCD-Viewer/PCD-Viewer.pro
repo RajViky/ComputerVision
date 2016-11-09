@@ -3,13 +3,12 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    pcd_helpers.cpp
 
 INCLUDEPATH += /usr/include/pcl-1.8 \
     /usr/include/eigen3 \
-    /usr/include/vtk/ \
-    ../../rtab-map-fork/rtabmap/corelib/include/ \
-    ../../rtab-map-fork/rtabmap/utilite/include/
+    /usr/include/vtk/
 
 LIBS +=  -lboost_system \
     -lboost_filesystem \
@@ -19,9 +18,7 @@ LIBS +=  -lboost_system \
     -lvtkRenderingCore \
     -lpcl_io \
     -lpcl_visualization \
-    -lpcl_common \
-    -lopencv_core \
-    -L../../rtab-map-fork/rtabmap/bin/ \
-    -lrtabmap_cored \
-    -lrtabmap_guid \
-    -lrtabmap_utilited
+    -lpcl_common
+
+HEADERS += \
+    pcd_helpers.h
