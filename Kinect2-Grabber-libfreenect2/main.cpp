@@ -100,7 +100,7 @@ int main(int argc, char **argv)
         std::cout << "     Capture frequency in Hz." << std::endl;
         std::cout << "     If not set or set to 0, data is stored as fast as possible." << std::endl;
         std::cout << "-store_all    -store_all=/path/data" << std::endl;
-        std::cout << "     If set: all images will be stored with timestamps in filenames to pat" << std::endl;
+        std::cout << "     If set: all images will be stored with timestamps in filenames to path" << std::endl;
         std::cout << "     Path WILL NOT BE CLEARED if it does exists." << std::endl;
         std::cout << "     Path WILL BE CREATED if it does not exists." << std::endl;
         std::cout << "     If not set: only current images will be stored." << std::endl;
