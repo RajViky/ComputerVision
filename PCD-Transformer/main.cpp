@@ -2,6 +2,7 @@
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/transforms.h>
+#include <pcl/filters/voxel_grid.h>
 
 #include <boost/filesystem.hpp>
 
@@ -17,6 +18,7 @@ int main(int argc, char **argv)
     std::string in = "/tmp/kinect2/pcd";
     std::string out = "/tmp/kinect2/pcd-out";
     std::string merged = "/tmp/kinect2/pcd-out.pcd"; //TODO: set this to ""
+    float grid = 0.01;
 
     for(std::string arg : args)
     {
@@ -38,8 +40,18 @@ int main(int argc, char **argv)
         }
         else if(arg.substr(0,6) == "merged")
         {
-            merged = arg.substr(4,arg.length()-4);
+            merged = arg.substr(7,arg.length()-7);
             std::cout << "Merged:  " << merged << ";" << std::endl;
+        }
+        else if(arg.substr(0,4) == "grid")
+        {
+            grid = (float)atof(arg.substr(5,arg.length()-5).c_str());
+            if(grid <= 0)
+            {
+                std::cout << "Illegal voxel gird size, set to default."  << std::endl;
+                grid = 0.01;
+            }
+            std::cout << "Voxel grid size:  " << grid << ";" << std::endl;
         }
     }
     if(help)
@@ -63,6 +75,9 @@ int main(int argc, char **argv)
         std::cout << "-merged       -merged=/tmp/out-pcd.pcd"<< std::endl;
         std::cout << "              If set all files will be merged to this file." << std::endl;
         std::cout << "              Disabled for single file." << std::endl;
+        std::cout << "-grid         -grid=0.001"<< std::endl;
+        std::cout << "              Voxel grid size for volxe filter on merged point cloud." << std::endl;
+        std::cout << "              Float in meters. Default 0.01" << std::endl;
         return 0;
     }
 
@@ -74,9 +89,14 @@ int main(int argc, char **argv)
     }
     if (!boost::filesystem::create_directories(pathOut))
     {
-        std::cout << "Cannot create output file directory," << std::endl;
+        std::cout << "Cannot create output file directory." << std::endl;
     }
 
+    boost::filesystem::path pathMerged = merged;
+    if(!exists(pathMerged.parent_path()) && !boost::filesystem::create_directories(pathMerged.parent_path()))
+    {
+        std::cout << "Cannot create parent directory for merged file." << std::endl;
+    }
     if ( exists( pathIn ) )
     {
         pcl::PCDReader reader;
@@ -169,9 +189,14 @@ int main(int argc, char **argv)
 
             if(wholeCloud->size())
             {
-                //cloud = util3d::voxelize(cloud, 0.01f);
+                pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
+                pcl::VoxelGrid<pcl::PointXYZRGB> sor;
+                sor.setInputCloud (wholeCloud);
+                sor.setLeafSize (grid, grid, grid);
+                sor.filter (*cloud_filtered);
+
                 pcl::PCDWriter writer;
-                writer.write( merged, *wholeCloud, true);
+                writer.write( merged, *cloud_filtered, true);
                 return 0;
             }
         }

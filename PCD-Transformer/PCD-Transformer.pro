@@ -12,7 +12,8 @@ INCLUDEPATH += /usr/include/pcl-1.8 \
 LIBS +=  -lboost_system \
     -lboost_filesystem \
     -lpcl_io \
-    -lpcl_common
+    -lpcl_common \
+    -lpcl_filters
 
 HEADERS += \
     ../PCD-Viewer/pcd_helpers.h
