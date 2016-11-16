@@ -150,7 +150,7 @@ int main() try
         // Display depth data by linearly mapping depth between 0 and 2 meters to the red channel
         glRasterPos2f(-1, 1);
         glPixelTransferf(GL_RED_SCALE, 0xFFFF * dev->get_depth_scale() / 2.0f);
-        glDrawPixels(640, 480, GL_RED, GL_UNSIGNED_SHORT, dev->get_frame_data(rs::stream::depth));
+        //glDrawPixels(640, 480, GL_RED, GL_UNSIGNED_SHORT, dev->get_frame_data(rs::stream::depth));
         glPixelTransferf(GL_RED_SCALE, 1.0f);
 
 
