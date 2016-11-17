@@ -434,7 +434,7 @@ echo "Module PCL"
 read -p "Create and activate? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
-        dir2xzm $PREFIX /mnt/sda1/porteus/modules/pcl.xzm
+        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/pcl-freenect2-WithDep.xzm
         /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/pcl-freenect2-WithDep.xzm;;
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
