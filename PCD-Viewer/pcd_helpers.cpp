@@ -1,4 +1,5 @@
 #include "pcd_helpers.h"
+#include <fstream>
 
 Eigen::Matrix4f PCD_Helpers::readTransform(boost::filesystem::path pcdPath) {
     std::vector<float>nL;
