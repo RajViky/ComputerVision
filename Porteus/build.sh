@@ -63,6 +63,8 @@ case $yn in
         wget http://www.vtk.org/files/release/7.0/VTK-7.0.0.tar.gz --no-check-certificate
         #PCL
         wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.8.0.tar.gz --no-check-certificate
+        #librealsense
+        git clone https://github.com/IntelRealSense/librealsense.git
         #DONE
         cd ..
         echo "Done.";;
@@ -358,7 +360,7 @@ case $yn in
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=$PREFIX \
             -DVTK_QT_VERSION:STRING="5" \
-            -DCMAKE_PREFIX_PATH=/opt/Qt/5.7/gcc_64/lib/cmake/Qt5/ \
+            -DCMAKE_PREFIX_PATH=/usr/lib64/qt5/lib/cmake/ \
             -DBUILD_DOCUMENTATION=OFF \
             -DBUILD_SHARED_LIBS=ON \
             -DBUILD_TESTING=OFF \
@@ -425,7 +427,24 @@ case $yn in
         make install DESTDIR=$DESTDIR
         cd ../..
 
-        sed -i "s|//usr||g" $DESTDIR/$LIBDIR/pkgconfig/pcl_*.pc;;
+        sed -i "s|//usr||g" $DESTDIR/$LIBDIR/pkgconfig/pcl_*.pc
+        sed -i "s|//usr||g" $DESTDIR/usr/share/pcl-1.8/PCLConfig.cmake;;
+    [Nn]* ) echo "Skipping...";;
+    * ) echo "Please answer yes or no.";;
+esac
+
+echo "librealsense"
+read -p "Build? yes/no:  " yn
+case $yn in
+    [Yy]* ) echo "building..."
+        cp -r sources/librealsense ./
+        cd librealsense
+        mkdir build && cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
+            -DLIB_INSTALL_DIR=$LIBDIR
+        make -j5
+        make install DESTDIR=$DESTDIR
+        cd ../.. ;;
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
 esac
@@ -434,157 +453,8 @@ echo "Module PCL"
 read -p "Create and activate? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
-        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/pcl-freenect2-WithDep.xzm
-        /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/pcl-freenect2-WithDep.xzm;;
+        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/pcl-freenect2-realsense-WithDep.xzm
+        /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/pcl-freenect2-realsense-WithDep.xzm;;
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
 esac
-
-#dir2xzm /opt/libfreenect2 /mnt/sda1/porteus/modules/libfreenect2.xzm
-
-# 
-# 
-# #LibDRM
-# #wget https://dri.freedesktop.org/libdrm/libdrm-2.4.71.tar.gz --no-check-certificate
-# #tar xf 
-# git clone git://anongit.freedesktop.org/mesa/drm
-# cd drm
-# ./autogen.sh
-# ./configure --prefix=$PREFIX --libdir=$LIBDIR --enable-udev
-# make
-# make install DESTDIR=$DESTDIR
-# cd ..
-# #
-# 
-# #dri3proto
-# wget https://www.x.org/releases/individual/proto/dri3proto-1.0.tar.bz2 --no-check-certificate
-# tar xf dri3proto-1.0.tar.bz2
-# cd dri3proto-1.0
-# ./configure --prefix=$PREFIX --libdir=$LIBDIR
-# make install DESTDIR=$DESTDIR
-# cd ..
-# 
-# #presentproto
-# wget  http://xorg.freedesktop.org/releases/individual/proto/presentproto-1.0.tar.bz2 --no-check-certificate
-# tar xf presentproto-1.0.tar.bz2
-# cd presentproto-1.0
-# ./configure --prefix=$PREFIX --libdir=$LIBDIR
-# make install DESTDIR=$DESTDIR
-# cd ..
-# 
-# 
-# #xcb-proto
-# export pkgname=xcb-proto
-# export pkgver=1.12
-# export url="http://xcb.freedesktop.org/"
-# wget $url/dist/$pkgname-$pkgver.tar.bz2 --no-check-certificate
-# tar xf $pkgname-$pkgver.tar.bz2
-# cd $pkgname-$pkgver
-# ./configure --prefix=$PREFIX --libdir=$LIBDIR
-# make
-# make install DESTDIR=$DESTDIR
-# cd ..
-# 
-# /opt/porteus-scripts/deactivate $/opt/prereq3.xzm
-# dir2xzm $DESTDIR /opt/prereq4.xzm
-# /opt/porteus-scripts/activate /opt/prereq4.xzm
-# 
-# #libxcb
-# #export PKG_CONFIG_PATH=$DESTDIR/$LIBDIR/pkgconfig
-# export pkgname=libxcb
-# export pkgver=1.12
-# export url="http://xcb.freedesktop.org/"
-# wget $url/dist/$pkgname-$pkgver.tar.bz2 --no-check-certificate
-# tar xf $pkgname-$pkgver.tar.bz2
-# cd $pkgname-$pkgver
-# ./configure --prefix=$PREFIX --libdir=$LIBDIR \
-#     --enable-xinput \
-#     --enable-xkb \
-#     --disable-static
-# make
-# make install DESTDIR=$DESTDIR
-# cd ..
-# 
-# #xproto - maybe I will need this in newer verwion
-# 
-# #libxshmfence
-# export pkgname=libxshmfence
-# export pkgver=1.2
-# export url="http://xorg.freedesktop.org/"
-# wget $url/releases/individual/lib/$pkgname-$pkgver.tar.bz2 --no-check-certificate
-# tar xf $pkgname-$pkgver.tar.bz2
-# cd $pkgname-$pkgver
-# ./configure --prefix=$PREFIX --libdir=$LIBDIR
-# make
-# make install DESTDIR=$DESTDIR
-# cd ..
-# rm $DESTDIR/$LIBDIR/$pkgname.a
-# 
-# 
-# /opt/porteus-scripts/deactivate /opt/prereq4.xzm
-# dir2xzm $DESTDIR /opt/prereq5.xzm
-# /opt/porteus-scripts/activate /opt/prereq5.xzm
-# 
-# 
-# wget https://mesa.freedesktop.org/archive/12.0.3/mesa-12.0.3.tar.xz --no-check-certificate
-# tar xf mesa-12.0.3.tar.xz
-# cd mesa-12.0.3
-# ./configure --prefix=$PREFIX --libdir=$LIBDIR --disable-gallium-llvm \
-#                --with-gallium-drivers=i915,ilo,svga,swrast,virgl \
-#                --with-dri-drivers=i915,i965,swrast \
-#                --with-egl-platforms=x11,drm \
-#                --disable-vulkan-icd-full-driver-path \
-#                --with-sha1=libnettle \
-#                --enable-texture-float \
-#                --enable-dri3 \
-#                --enable-osmesa \
-#                --enable-xa \
-#                --enable-gbm \
-#                --enable-nine \
-#                --enable-xvmc \
-#                --enable-glx-tlscd
-# make -j5
-# make install DESTDIR=$DESTDIR
-# cd ..
-# 
-# 
-# /opt/porteus-scripts/deactivate /opt/prereq5.xzm
-# dir2xzm $DESTDIR /mnt/sda1/porteus/modules/mesa.xzm
-# /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/mesa.xzm
-# 
-# 
-# #Probably needs to be moved forward!!!!!!!!!!!!!!!!!!!!!
-# export DESTDIR=/opt/opencv2
-# #OpenCV 2.4.13
-# wget http://github.com/Itseez/opencv/archive/2.4.13.zip --no-check-certificate
-# unzip 2.4.13.zip
-# cd opencv-2.4.13
-# mkdir release
-# cd release
-# cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=$PREFIX cmake -DENABLE_PRECOMPILED_HEADERS=OFF -DLIB_SUFFIX=64 ..
-# make -j5
-# make install DESTDIR=$DESTDIR
-# cd ../..
-# dir2xzm $DESTDIR /mnt/sda1/porteus/modules/opencv2.xzm
-# /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/opencv2.xzm
-# 
-# 
-# export DESTDIR=/opt/rtabmap
-# export PREFIX=/usr
-# export LIBDIR=/usr/lib64
-# export PATH=$DESTDIR/$PREFIX/usr/bin:$PATH
-# export INCLUDE_PATH=/usr/include/eigen3:$INCLUDE_PATH
-# export LIBRARY_PATH=$DESTDIR/$LIBDIR:$LIBRARY_PATH
-# export LD_LIBRARY_PATH=$DESTDIR/$LIBDIR:$LD_LIBRARY_PATH
-# 
-# #MOVE TO APPROPRIATE PLACE - where eigen is built!
-# ln -s /usr/include/eigen3/* /usr/include/
-# 
-# git clone https://github.com/introlab/rtabmap.git rtabmap
-# cd rtabmap/build
-# cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX
-# make -j5
-# make install DESTDIR=$DESTDIR
-# 
-# dir2xzm $DESTDIR /mnt/sda1/porteus/modules/rtabmap.xzm
-# /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/rtabmap.xzm
