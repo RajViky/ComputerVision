@@ -117,7 +117,7 @@ int main(int argc, char **argv)
         std::cout << "              -type=Depth2RGB" << std::endl;
         std::cout << "              -type=both" << std::endl;
         std::cout << "     Default RGB2Depth." << std::endl;
-        std::cout << "     Depth2RGB can be WERY SLOOOOOW." << std::endl;
+        std::cout << "     Depth2RGB can be WERY SLOOOOOW. Because of big resolution." << std::endl;
         std::cout << "     Generated config .yaml is for RGB2Depth!" << std::endl;
         std::cout << "-f            -f=60" << std::endl;
         std::cout << "     Capture frequency in Hz." << std::endl;
