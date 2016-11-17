@@ -21,10 +21,18 @@ int main(int argc, char **argv) try
     bool help = false;
     std::string dir = "";
     std::string store_all = "";
-    //bool orig = false;
     float freq = 0;
     size_t framemax = -1;
     int device_id = 0;
+    bool Depth2RGB = true;
+    bool RGB2Depth = false;
+    bool orig = false;
+    int colorWidth = 640;
+    int colorHeight = 480;
+    int colorF = 60;
+    int depthWidth = 640;
+    int depthHeight = 480;
+    int depthF = 60;
 
     for(std::string arg : args)
     {
@@ -44,6 +52,197 @@ int main(int argc, char **argv) try
         {
             dir = arg.substr(4,arg.length()-4);
             std::cout << "Main path:   " << dir << ";" << std::endl;
+        }
+        else if(arg.substr(0,4) == "type")
+        {
+            std::string type = arg.substr(5,arg.length()-5);
+            if(type == "Depth2RGB")
+            {
+                RGB2Depth = true;
+                Depth2RGB = false;
+            }
+            else if(type == "both" || type == "Both")
+            {
+                RGB2Depth = true;
+                Depth2RGB = true;
+            }
+            else if(type != "RGB2Depth")
+            {
+                std::cout << "Unknown type!" << std::endl;
+                return -1;
+            }
+            std::cout << "Type:" << type << std::endl;
+        }
+        else if(arg.substr(0,7) == "RGBMode")
+        {
+            std::string mode = arg.substr(8,arg.length()-8);
+            if(mode == "1920x1080@30")
+            {
+                colorWidth = 1920;
+                colorHeight = 1080;
+                colorF = 30;
+            }
+            else if(mode == "1920x1080@15")
+            {
+                colorWidth = 1920;
+                colorHeight = 1080;
+                colorF = 15;
+            }
+            else if(mode == "640x480@60")
+            {
+                colorWidth = 640;
+                colorHeight = 480;
+                colorF = 60;
+            }
+            else if(mode == "640x480@30")
+            {
+                colorWidth = 640;
+                colorHeight = 480;
+                colorF = 30;
+            }
+            else if(mode == "320x240@60")
+            {
+                colorWidth = 320;
+                colorHeight = 240;
+                colorF = 60;
+            }
+            else if(mode == "320x240@30")
+            {
+                colorWidth = 320;
+                colorHeight = 240;
+                colorF = 30;
+            }
+        }
+
+        else if(arg.substr(0,9) == "DepthMode")
+        {
+            std::string mode = arg.substr(10,arg.length()-10);
+            if(mode == "640x480@90")
+            {
+                depthWidth = 640;
+                depthHeight = 480;
+                depthF = 90;
+            }
+            else if(mode == "640x480@60")
+            {
+                depthWidth = 640;
+                depthHeight = 480;
+                depthF = 60;
+            }
+            else if(mode == "640x480@30")
+            {
+                depthWidth = 640;
+                depthHeight = 480;
+                depthF = 30;
+            }
+            else if(mode == "628x468@90")
+            {
+                depthWidth = 628;
+                depthHeight = 468;
+                depthF = 90;
+            }
+            else if(mode == "628x468@60")
+            {
+                depthWidth = 628;
+                depthHeight = 468;
+                depthF = 60;
+            }
+            else if(mode == "628x468@30")
+            {
+                depthWidth = 628;
+                depthHeight = 468;
+                depthF = 30;
+            }
+            else if(mode == "492x372@90")
+            {
+                depthWidth = 492;
+                depthHeight = 372;
+                depthF = 90;
+            }
+            else if(mode == "492x372@60")
+            {
+                depthWidth = 492;
+                depthHeight = 372;
+                depthF = 60;
+            }
+            else if(mode == "492x372@30")
+            {
+                depthWidth = 492;
+                depthHeight = 372;
+                depthF = 30;
+            }
+            else if(mode == "480x360@90")
+            {
+                depthWidth = 480;
+                depthHeight = 360;
+                depthF = 90;
+            }
+            else if(mode == "480x360@60")
+            {
+                depthWidth = 480;
+                depthHeight = 360;
+                depthF = 60;
+            }
+            else if(mode == "480x360@30")
+            {
+                depthWidth = 480;
+                depthHeight = 360;
+                depthF = 30;
+            }
+            else if(mode == "332x252@90")
+            {
+                depthWidth = 332;
+                depthHeight = 252;
+                depthF = 90;
+            }
+            else if(mode == "332x252@60")
+            {
+                depthWidth = 332;
+                depthHeight = 252;
+                depthF = 60;
+            }
+            else if(mode == "332x252@30")
+            {
+                depthWidth = 332;
+                depthHeight = 252;
+                depthF = 30;
+            }
+
+            else if(mode == "320x240@90")
+            {
+                depthWidth = 320;
+                depthHeight = 240;
+                depthF = 90;
+            }
+            else if(mode == "320x240@60")
+            {
+                depthWidth = 320;
+                depthHeight = 240;
+                depthF = 60;
+            }
+            else if(mode == "320x240@30")
+            {
+                depthWidth = 320;
+                depthHeight = 240;
+                depthF = 30;
+            }
+        }
+        else if(arg.substr(0,4) == "orig")
+        {
+            orig = true;
+            std::cout << "Original images will be stored." << std::endl;
+        }
+        if(arg.substr(0,5) == "clean")
+        {
+            std::cout << "Cleaning after unpropper exit." << std::endl;
+            sigint_handler(0);
+            break;
+        }
+        if(arg.substr(0,5) == "info")
+        {
+            std::cout << "Devices:" << std::endl;
+            sigint_handler(0);
+            break;
         }
         else if(arg.substr(0,2) == "id")
         {
@@ -77,6 +276,28 @@ int main(int argc, char **argv) try
         std::cout << "     Path WILL BE CLEARED if it does exists." << std::endl;
         std::cout << "     Path WILL BE CREATED if it does not exists." << std::endl;
         std::cout << "     If not set /tmp/kinect2 is used." << std::endl;
+        std::cout << "-type         -type=Depth2RGB" << std::endl;
+        std::cout << "              -type=RGB2Depth" << std::endl;
+        std::cout << "              -type=both" << std::endl;
+        std::cout << "     Default Depth2RGB." << std::endl;
+        std::cout << "     Generated config .yaml is for Depth2RGB 640x480!" << std::endl;
+        std::cout << "-RGBMode      -RGBMode=1920x1080@30" << std::endl;
+        std::cout << "     Available:" << std::endl;
+        std::cout << "           1920x1080@30" << std::endl;
+        std::cout << "           1920x1080@15" << std::endl;
+        std::cout << "            640x480@60 (Default)" << std::endl;
+        std::cout << "            640x480@30" << std::endl;
+        std::cout << "            320x240@60|30" << std::endl;
+        std::cout << "-DepthMode    -DepthMode=640x480@60" << std::endl;
+        std::cout << "     Available:" << std::endl;
+        std::cout << "            640x480@90" << std::endl;
+        std::cout << "            640x480@60 (Default)" << std::endl;
+        std::cout << "            640x480@30" << std::endl;
+        std::cout << "            628x468@90|60|30" << std::endl;
+        std::cout << "            492x372@90|60|30" << std::endl;
+        std::cout << "            480x360@90|60|30" << std::endl;
+        std::cout << "            332x252@90|60|30" << std::endl;
+        std::cout << "            320x240@90|60|30" << std::endl;
         std::cout << "-f            -f=60" << std::endl;
         std::cout << "     Capture frequency in Hz." << std::endl;
         std::cout << "     If not set or set to 0, data is stored as fast as possible." << std::endl;
@@ -90,12 +311,15 @@ int main(int argc, char **argv) try
         std::cout << "     Applicatin will exit when limit is reached." << std::endl;
         std::cout << "     Unlimited if not set." << std::endl;
         std::cout << " --------------------------------------" << std::endl;
-        //        std::cout << " " << std::endl;
-        //        std::cout << "-orig" << std::endl;
-        //        std::cout << "     RGB images in original resolution are also stored." << std::endl;
-        //        std::cout << " --------------------------------------" << std::endl;
+        std::cout << " " << std::endl;
+        std::cout << "-orig" << std::endl;
+        std::cout << "     RGB images in original resolution are also stored." << std::endl;
+        std::cout << "     Works only with -type=RGB2Depth" << std::endl;
+        std::cout << " --------------------------------------" << std::endl;
         std::cout << " -clean" << std::endl;
         std::cout << "     Run clenup after unpropper exit." << std::endl;
+        std::cout << " -info" << std::endl;
+        std::cout << "     Prints info about connected devices." << std::endl;
         std::cout << " -help" << std::endl;
         std::cout << "     Print this help." << std::endl;
         return 0;
@@ -112,7 +336,10 @@ int main(int argc, char **argv) try
             boost::filesystem::remove_all(path);
         }
         if (!boost::filesystem::create_directories(path / "rgb")
-                || !boost::filesystem::create_directories(path / "depth"))
+                || !boost::filesystem::create_directories(path / "depth")
+                || !boost::filesystem::create_directories(path / "RGB2Depth"/"rgb")
+                || !boost::filesystem::create_directories(path / "RGB2Depth"/"depth")
+                || !boost::filesystem::create_directories(path / "RGB2Depth"/"orig_rgb"))
         {
             std::cout << "Cannot create tmp directories" << std::endl;
             return -1;
@@ -122,7 +349,10 @@ int main(int argc, char **argv) try
         {
             path = store_all;
             if ((!boost::filesystem::is_directory(path / "rgb") && !boost::filesystem::create_directories(path / "rgb"))
-                    || (!boost::filesystem::is_directory(path / "depth") && !boost::filesystem::create_directories(path / "depth")))
+                    || (!boost::filesystem::is_directory(path / "depth") && !boost::filesystem::create_directories(path / "depth"))
+                    || (!boost::filesystem::is_directory(path / "RGB2Depth"/"rgb") && !boost::filesystem::create_directories(path / "RGB2Depth"/"rgb"))
+                    || (!boost::filesystem::is_directory(path / "RGB2Depth"/"orig_rgb") && !boost::filesystem::create_directories(path / "RGB2Depth"/"orig_rgb"))
+                    || (!boost::filesystem::is_directory(path / "RGB2Depth"/"depth") && !boost::filesystem::create_directories(path / "RGB2Depth"/"depth")))
             {
                 std::cout << "Cannot create store_all directories" << std::endl;
                 return -1;
@@ -157,9 +387,6 @@ int main(int argc, char **argv) try
     //==========
 
     rs::context ctx;
-    rs::log_to_console(rs::log_severity::warn);
-    //rs::log_to_file(rs::log_severity::debug, "librealsense.log");
-
     int device_count = ctx.get_device_count();
     if (!device_count) printf("No device detected. Is it plugged in?\n");
     for(int i = 0; i < device_count; ++i)
@@ -215,7 +442,8 @@ int main(int argc, char **argv) try
             dev->disable_stream(strm);
         }
     }
-
+    rs::log_to_console(rs::log_severity::warn);
+    //rs::log_to_file(rs::log_severity::debug, "librealsense.log");
     rs::device & dev = *ctx.get_device(device_id);
 
     //CREATE CONFIGS
@@ -254,10 +482,8 @@ int main(int argc, char **argv) try
         calibration_file << "       1. ]" << std::endl;
         calibration_file.close();
     }
-    //dev.enable_stream(rs::stream::depth, rs::preset::best_quality);
-    //dev.enable_stream(rs::stream::color, rs::preset::best_quality);
-    dev.enable_stream(rs::stream::depth, 640,480,rs::format::z16, 60);
-    dev.enable_stream(rs::stream::color, 640,480,rs::format::rgb8, 60);
+    dev.enable_stream(rs::stream::depth, depthWidth,depthHeight,rs::format::z16, depthF);
+    dev.enable_stream(rs::stream::color, colorWidth,colorHeight,rs::format::rgb8, colorF);
     dev.start();
 
     while (!shutdown && (framemax == (size_t)-1 || framecount < framemax))
@@ -271,7 +497,6 @@ int main(int argc, char **argv) try
             int last_diff = (t1-last_image).total_milliseconds();
             if(last_diff<wanted_diff)
                 usleep((wanted_diff-last_diff)*1000);
-            //std::cout << "Sleep: " <<  wanted_diff << " - " << last_diff << " = " << (wanted_diff - last_diff) << std::endl;
             t1 = boost::posix_time::microsec_clock::local_time();
         }
         double diff = (t1-epoch).total_milliseconds()/1000.0;
@@ -282,35 +507,63 @@ int main(int argc, char **argv) try
         ss << std::fixed << std::setprecision(4) << diff;
         std::string time = ss.str();
 
+        cv::Mat rgb;
+        cv::Mat depth;
+        cv::Mat rgb2;
+        cv::Mat depth2;
+        if(Depth2RGB)
+        {
+            rgb = cv::Mat(colorHeight, colorWidth, CV_8UC3, (uchar *) dev.get_frame_data(rs::stream::color));
+            depth = cv::Mat(colorHeight, colorWidth, CV_16U, (uchar *) dev.get_frame_data(rs::stream::depth_aligned_to_color));
+        }
+        if(RGB2Depth)
+        {
+            rgb2 = cv::Mat(depthHeight, depthWidth, CV_8UC3, (uchar *) dev.get_frame_data(rs::stream::color_aligned_to_depth));
+            depth2 = cv::Mat(depthHeight, depthWidth, CV_16U, (uchar *) dev.get_frame_data(rs::stream::depth));
+            if(orig)
+                rgb = cv::Mat(colorHeight, colorWidth, CV_8UC3, (uchar *) dev.get_frame_data(rs::stream::color));
+        }
 
-        cv::Mat rgb(480, 640, CV_8UC3, (uchar *) dev.get_frame_data(rs::stream::color));
-        cv::Mat depth16(480, 640, CV_16U, (uchar *) dev.get_frame_data(rs::stream::depth_aligned_to_color));
-        //cv::Mat rgb_orig(360, 480, CV_8UC3, (uchar *) dev.get_frame_data(rs::stream::color_aligned_to_depth));
-        //        cv::Mat orig_rgb(480, 640, CV_8UC3, (uchar *) dev.get_frame_data(rs::stream::color_aligned_to_depth));
-        //        cv::Mat orig_depth(480, 640, CV_16U, (uchar *) dev.get_frame_data(rs::stream::depth));
+        if(Depth2RGB)
+        {
+            imwrite( dir +"/depth/tmp-depth.png", depth );
+            imwrite( dir +"/rgb/tmp-rgb.png", rgb );
+        }
+        if(RGB2Depth)
+        {
+            imwrite( dir +"/RGB2Depth/depth/tmp-depth.png", depth2 );
+            imwrite( dir +"/RGB2Depth/rgb/tmp-rgb.png", rgb2 );
+            if(orig)
+                imwrite( dir +"/RGB2Depth/orig_rgb/tmp-orig_rgb.jpg", rgb );
+        }
 
-        imwrite( dir +"/depth/tmp-depth.png", depth16 );
-        imwrite( dir +"/rgb/tmp-rgb.png", rgb );
-        //        if(orig)
-        //        {
-        //            imwrite( dir +"/orig_rgb/tmp-orig_rgb.jpg", orig_rgb );
-        //            imwrite( dir +"/orig_rgb/tmp-orig_depth.jpg", orig_depth );
-        //        }
-
-        boost::filesystem::rename(dir +"/depth/tmp-depth.png",dir +"/depth/depth.png");
-        boost::filesystem::rename(dir +"/rgb/tmp-rgb.png",dir +"/rgb/rgb.png");
-        //        if(orig)
-        //        {
-        //            boost::filesystem::rename(dir +"/orig_rgb/tmp-orig_rgb.jpg",dir +"/orig_rgb/orig_rgb.jpg");
-        //            boost::filesystem::rename(dir +"/orig_rgb/tmp-orig_depth.jpg",dir +"/orig_rgb/orig_depth.jpg");
-        //        }
+        if(Depth2RGB)
+        {
+            boost::filesystem::rename(dir +"/depth/tmp-depth.png",dir +"/depth/depth.png");
+            boost::filesystem::rename(dir +"/rgb/tmp-rgb.png",dir +"/rgb/rgb.png");
+        }
+        if(RGB2Depth)
+        {
+            boost::filesystem::rename(dir +"/RGB2Depth/depth/tmp-depth.png",dir +"/RGB2Depth/depth/depth.png");
+            boost::filesystem::rename(dir +"/RGB2Depth/rgb/tmp-rgb.png",dir +"/RGB2Depth/rgb/rgb.png");
+            if(orig)
+                boost::filesystem::rename(dir +"/RGB2Depth/orig_rgb/tmp-orig_rgb.jpg",dir +"/RGB2Depth/orig_rgb/orig_rgb.jpg");
+        }
 
         if(store_all != "")
         {
-            boost::filesystem::copy_file( dir +"/depth/depth.png",store_all +"/depth/"+time+".png");
-            boost::filesystem::copy_file( dir +"/rgb/rgb.png",store_all +"/rgb/"+time+".png");
-            //            if(orig)
-            //                boost::filesystem::copy_file(dir +"/orig_rgb/orig_rgb.jpg",store_all +"/orig_rgb/"+time+".jpg");
+            if(Depth2RGB)
+            {
+                boost::filesystem::copy_file( dir +"/depth/depth.png",store_all +"/depth/"+time+".png");
+                boost::filesystem::copy_file( dir +"/rgb/rgb.png",store_all +"/rgb/"+time+".png");
+            }
+            if(RGB2Depth)
+            {
+                boost::filesystem::copy_file( dir +"/RGB2Depth/depth/depth.png",store_all +"/RGB2Depth/depth/"+time+".png");
+                boost::filesystem::copy_file( dir +"/RGB2Depth/rgb/rgb.png",store_all +"/RGB2Depth/rgb/"+time+".png");
+                if(orig)
+                    boost::filesystem::copy_file( dir +"/RGB2Depth/orig_rgb/orig_rgb.jpg",store_all +"/RGB2Depth/orig_rgb/"+time+".png");
+            }
         }
     }
     return EXIT_SUCCESS;
