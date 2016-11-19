@@ -5,7 +5,7 @@ CONFIG -= qt
 
 SOURCES += main.cpp
 
-LIBS +=  -lrealsense -lglfw -lGL -lGLU -lusb \
+LIBS +=  -lrealsense \
     -lboost_system \
     -lboost_filesystem \
     -lboost_date_time \
