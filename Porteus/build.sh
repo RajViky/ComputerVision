@@ -22,16 +22,6 @@ export INCLUDE_PATH=$DESTDIR/usr/include:$INCLUDE_PATH
 export LIBRARY_PATH=$DESTDIR/$LIBDIR:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$DESTDIR/$LIBDIR:$LD_LIBRARY_PATH
 
-#Pangloin
-# git clone https://github.com/stevenlovegrove/Pangolin.git
-# cd Pangolin
-# mkdir build
-# cd build
-# cmake -D CMAKE_INSTALL_PREFIX=$PREFIX ..
-# make -j4
-# make install DESTDIR=$DESTDIR
-# cd ../..
-
 read -p "Download sources? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "Downloading..."
@@ -39,32 +29,23 @@ case $yn in
         cd sources
         #openni2
         git clone https://github.com/occipital/OpenNI2.git
-        #libusb
-        wget http://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.20/libusb-1.0.20.tar.bz2 --no-check-certificate
-        #libjpeg-turbo
-        wget http://downloads.sourceforge.net/project/libjpeg-turbo/1.5.1/libjpeg-turbo-1.5.1.tar.gz --no-check-certificate
         #freenect2
         git clone https://github.com/OpenKinect/libfreenect2.git
         #FLANN
         wget http://www.cs.ubc.ca/research/flann/uploads/FLANN/flann-1.8.4-src.zip --no-check-certificate
-        #HDF5
-        wget https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.10.0-patch1.tar.bz2 --no-check-certificate
-        #NETCDF
-        wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.4.1.tar.gz
-        #NETCDFcxx
-        wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-cxx-4.2.tar.gz
-        #GL2PS
-        wget http://geuz.org/gl2ps/src/gl2ps-1.3.9.tgz --no-check-certificate
         #GDAL
         wget http://download.osgeo.org/gdal/2.1.1/gdal-2.1.1.tar.xz --no-check-certificate
-        #JSONCPP
-        git clone https://github.com/open-source-parsers/jsoncpp
+        #NETCDFcxx
+        wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-cxx-4.2.tar.gz
         #VTK
         wget http://www.vtk.org/files/release/7.0/VTK-7.0.0.tar.gz --no-check-certificate
         #PCL
         wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.8.0.tar.gz --no-check-certificate
         #librealsense
         git clone https://github.com/IntelRealSense/librealsense.git
+        #opencv
+        wget https://github.com/Itseez/opencv/archive/3.1.0.zip --no-check-certificate
+        wget https://github.com/Itseez/opencv_contrib/archive/3.1.0.tar.gz --no-check-certificate
         #DONE
         cd ..
         echo "Done.";;
@@ -72,7 +53,7 @@ case $yn in
     * ) echo "Please answer yes or no.";;
 esac
 
-echo "Openni2"
+echo "Openni2" #No dep
 read -p "Build? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
@@ -87,13 +68,6 @@ case $yn in
         cp Bin/x64-Release/*.so $DESTDIR/$LIBDIR/
         cp -r Bin/x64-Release/OpenNI2 $DESTDIR/$LIBDIR/
         cp -r Include/* $DESTDIR/usr/include/
-        cp Bin/x64-Release/ClosestPointViewer $DESTDIR/usr/bin/
-        cp Bin/x64-Release/EventBasedRead $DESTDIR/usr/bin/
-        cp Bin/x64-Release/MultiDepthViewer $DESTDIR/usr/bin/
-        cp Bin/x64-Release/MultipleStreamRead $DESTDIR/usr/bin/
-        cp Bin/x64-Release/MWClosestPointApp $DESTDIR/usr/bin/
-        cp Bin/x64-Release/SimpleRead $DESTDIR/usr/bin/
-        cp Bin/x64-Release/SimpleViewer $DESTDIR/usr/bin/
         cp Packaging/Linux/primesense-usb.rules $DESTDIR/etc/udev/rules.d/557-primesense-usb.rules
         cp -r Config/* $DESTDIR/etc/OpenNI2/
         export PKGCFGFILE=$DESTDIR/$LIBDIR/pkgconfig/libopenni2.pc
@@ -113,31 +87,122 @@ case $yn in
         * ) echo "Please answer yes or no.";;
 esac
 
-echo "NEW libUSB"
+#libfreenect2
+echo "libfreenect2" #dep: only openni
 read -p "Build? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
-        cp -r sources/libusb-1.0.20.tar.bz2 ./
-        tar xf libusb-1.0.20.tar.bz2
-        cd libusb-1.0.20
-        ./configure --prefix=$PREFIX --libdir=$LIBDIR
-        make
+        cp -r sources/libfreenect2 ./
+        cd libfreenect2
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
+            -DCMAKE_PREFIX_PATH=$DESTDIR$PREFIX \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_OPENNI2_DRIVER=ON \
+            -DENABLE_CXX11=ON \
+            -DBUILD_EXAMPLES=ON \
+            -DCMAKE_INSTALL_LIBDIR=$LIBDIR
+        make -j5
+        make install DESTDIR=$DESTDIR       
+        
+        mkdir -p $DESTDIR/etc/udev/rules.d/
+        cp ../platform/linux/udev/90-kinect2.rules $DESTDIR/etc/udev/rules.d/
+
+        cd ../..
+        cp -r $DESTDIR/usr/lib/* $DESTDIR/$LIBDIR
+        rm -rf $DESTDIR/usr/lib
+        sed -i "s|/lib|/lib64|g" $DESTDIR/$LIBDIR/pkgconfig/freenect2.pc;;
+    [Nn]* ) echo "Skipping...";;
+    * ) echo "Please answer yes or no.";;
+esac
+
+
+echo "librealsense" #dep: not tested
+read -p "Build? yes/no:  " yn
+case $yn in
+    [Yy]* ) echo "building..."
+        cp -r sources/librealsense ./
+        cd librealsense
+        mkdir build && cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
+            -DCMAKE_PREFIX_PATH=$DESTDIR$PREFIX \
+            -DLIB_INSTALL_DIR=$LIBDIR
+        make -j4
+        make install DESTDIR=$DESTDIR
+        #build kernel module
+        cd ../scripts
+        wget https://raw.githubusercontent.com/TomasBedrnik/ComputerVision/master/Porteus/patch-porteus.sh --no-check-certificate
+        chmod +x patch-porteus.sh
+        ./patch-porteus.sh
+        mkdir -p $DESTDIR/lib/modules/4.8.6-porteus/kernel/drivers/media/usb/uvc/
+        cp uvcvideo.ko $DESTDIR/lib/modules/4.8.6-porteus/kernel/drivers/media/usb/uvc/
+        mkdir -p $DESTDIR/etc/udev/rules.d/
+        cp ../config/99-realsense-libusb.rules $DESTDIR/etc/udev/rules.d/
+        cd ../.. ;;
+    [Nn]* ) echo "Skipping...";;
+    * ) echo "Please answer yes or no.";;
+esac
+
+echo "FLANN"
+read -p "Build? yes/no:  " yn
+case $yn in
+    [Yy]* ) echo "building..."
+        cp -r sources/flann-1.8.4-src.zip ./
+        #FLANN
+        unzip flann-1.8.4-src.zip 
+        cd flann-1.8.4-src
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
+            -DCMAKE_PREFIX_PATH=$DESTDIR$PREFIX \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_MATLAB_BINDINGS=OFF \
+            -DBUILD_PYTHON_BINDINGS=OFF
+        make -j5
+        make install DESTDIR=$DESTDIR
+        cd ../..
+        cp -r $DESTDIR/usr/lib/* $DESTDIR/$LIBDIR
+        rm -rf $DESTDIR/usr/lib
+        sed -i "s|/lib|/lib64|g" $DESTDIR/$LIBDIR/pkgconfig/flann.pc;;
+    [Nn]* ) echo "Skipping...";;
+    * ) echo "Please answer yes or no.";;
+esac
+
+#GDAL
+# --with-python
+echo "GDAL" #dep: not tested
+read -p "Build? yes/no:  " yn
+case $yn in
+    [Yy]* ) echo "building..."
+        cp -r sources/gdal-2.1.1.tar.xz ./
+        tar xf gdal-2.1.1.tar.xz
+        cd gdal-2.1.1
+        ./configure --prefix=$PREFIX --libdir=$LIBDIR --with-netcdf --with-libtiff --with-sqlite3 --with-geotiff \
+                    --with-mysql --with-curl --with-hdf5 --with-perl --with-geos \
+                    --with-png --with-poppler --with-spatialite --with-openjpeg --enable-static=no
+        make  -j5
         make install DESTDIR=$DESTDIR
         cd ..;;
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
 esac
 
-echo "libjpeg-turbo"
+#NetCDF-cxx
+echo "NetCDF-cxx"
 read -p "Build? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
-        cp -r sources/libjpeg-turbo-1.5.1.tar.gz ./
-        tar xf libjpeg-turbo-1.5.1.tar.gz
-        cd libjpeg-turbo-1.5.1
-        ./configure --prefix=$PREFIX --libdir=$LIBDIR --with-jpeg8
+        cp -r sources/netcdf-cxx-4.2.tar.gz ./
+        export CPPFLAGS=-I$DESTDIR/usr/include 
+        export LDFLAGS=-L$DESTDIR/$LIBDIR
+        tar xf netcdf-cxx-4.2.tar.gz
+        cd netcdf-cxx-4.2
+        ./configure --prefix=$PREFIX --libdir=$LIBDIR --enable-shared
         make -j5
         make install DESTDIR=$DESTDIR
+        export CPPFLAGS=
+        export LDFLAGS=
         cd ..;;
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
@@ -153,200 +218,12 @@ case $yn in
     * ) echo "Please answer yes or no.";;
 esac
 
-#libfreenect2
-echo "libfreenect2"
-read -p "Build? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        cp -r sources/libfreenect2 ./
-        cd libfreenect2
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_OPENNI2_DRIVER=ON \
-            -DENABLE_CXX11=ON \
-            -DBUILD_EXAMPLES=ON \
-            -DCMAKE_INSTALL_LIBDIR=$LIBDIR
-        make -j5
-        make install DESTDIR=$DESTDIR
-        cd ../..
-        cp -r $DESTDIR/usr/lib/* $DESTDIR/$LIBDIR
-        rm -rf $DESTDIR/usr/lib
-        sed -i "s|/lib|/lib64|g" $DESTDIR/$LIBDIR/pkgconfig/freenect2.pc;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-
-echo "FLANN"
-read -p "Build? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        cp -r sources/flann-1.8.4-src.zip ./
-        #FLANN
-        unzip flann-1.8.4-src.zip 
-        cd flann-1.8.4-src
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_MATLAB_BINDINGS=OFF \
-            -DBUILD_PYTHON_BINDINGS=OFF
-        make -j5
-        make install DESTDIR=$DESTDIR
-        cd ../..
-        cp -r $DESTDIR/usr/lib/* $DESTDIR/$LIBDIR
-        rm -rf $DESTDIR/usr/lib
-        sed -i "s|/lib|/lib64|g" $DESTDIR/$LIBDIR/pkgconfig/flann.pc;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-echo "HDF5"
-read -p "Build? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        cp sources/hdf5-1.10.0-patch1.tar.bz2 ./
-        tar xf hdf5-1.10.0-patch1.tar.bz2
-        cd hdf5-1.10.0-patch1
-        ./configure --prefix=$PREFIX --libdir=$LIBDIR \
-            --enable-build-mode=production \
-            --enable-hl \
-            --enable-linux-lfs \
-            --with-pic
-        make -j5
-        make install DESTDIR=$DESTDIR
-        cd ..;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-echo "Module Prereq1"
-read -p "Create and activate? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        /opt/porteus-scripts/deactivate $/opt/prereq0.xzm
-        dir2xzm $DESTDIR /opt/prereq1.xzm
-        /opt/porteus-scripts/activate /opt/prereq1.xzm;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-#NetCDF
-echo "NetCDF"
-read -p "Build? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        cp -r sources/netcdf-4.4.1.tar.gz ./
-        tar xf netcdf-4.4.1.tar.gz
-        cd netcdf-4.4.1
-        ./configure --prefix=$PREFIX --libdir=$LIBDIR --enable-shared --enable-netcdf-4 --enable-dap-netcdf
-        make -j5
-        make install DESTDIR=$DESTDIR
-        cd ..;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-
-#NetCDF-cxx
-echo "NetCDF-cxx"
-read -p "Build? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        cp -r sources/netcdf-cxx-4.2.tar.gz ./
-        export CPPFLAGS=-I$DESTDIR/usr/include 
-        export LDFLAGS=-L$DESTDIR/$LIBDIR
-        tar xf netcdf-cxx-4.2.tar.gz
-        cd netcdf-cxx-4.2
-        ./configure --prefix=$PREFIX --libdir=$LIBDIR --enable-shared
-        make -j5
-        make install DESTDIR=$DESTDIR
-        cd ..;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-#GL2PS
-echo "GL2PS"
-read -p "Build? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        cp -r sources/gl2ps-1.3.9.tgz ./
-        tar xf gl2ps-1.3.9.tgz
-        cd gl2ps-1.3.9-source
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_EXE_LINKER_FLAGS=-lm
-        make -j5
-        make install DESTDIR=$DESTDIR
-        cd ../..
-        cp -r $DESTDIR/usr/lib/* $DESTDIR/$LIBDIR
-        rm -rf $DESTDIR/usr/lib;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-#GDAL
-echo "GDAL"
-read -p "Build? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        cp -r sources/gdal-2.1.1.tar.xz ./
-        tar xf gdal-2.1.1.tar.xz
-        cd gdal-2.1.1
-        ./configure --prefix=$PREFIX --libdir=$LIBDIR --with-netcdf --with-libtiff --with-sqlite3 --with-geotiff \
-                    --with-mysql --with-python --with-curl --with-hdf5 --with-perl --with-geos \
-                    --with-png --with-poppler --with-spatialite --with-openjpeg --enable-static=no
-        make  -j5
-        make install DESTDIR=$DESTDIR
-        cd ..;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-echo "jsoncpp"
-read -p "Build? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        cp -r sources/jsoncpp ./
-        cd jsoncpp
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_SHARED_LIBS=ON \
-            -DBUILD_STATIC_LIBS=OFF
-        make -j5
-        make install DESTDIR=$DESTDIR
-        cd ../..
-        cp -r $DESTDIR/usr/lib/* $DESTDIR/$LIBDIR
-        rm -rf $DESTDIR/usr/lib
-        sed -i "s|/lib|/lib64|g" $DESTDIR/$LIBDIR/pkgconfig/jsoncpp.pc;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-echo "Module Prereq2"
-read -p "Create and activate? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        /opt/porteus-scripts/deactivate $/opt/prereq1.xzm
-        dir2xzm $DESTDIR /opt/prereq2.xzm
-        /opt/porteus-scripts/activate /opt/prereq2.xzm;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-
 #VTK
-echo "VTK"
+echo "VTK" #dep: tcl tk gdal (for module Module_vtkIOGDAL), netcdf-cxx, libxml2, probably: gl2ps, hdf5, gcc-gfortran, flann but not tested
 read -p "Build? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
         cp -r sources/VTK-7.0.0.tar.gz ./
-        #git clone https://github.com/Kitware/VTK.git
         tar xf VTK-7.0.0.tar.gz
         cd VTK-7.0.0
         wget https://raw.githubusercontent.com/TomasBedrnik/ComputerVision/master/Porteus/patchCMakeLists.txt --no-check-certificate
@@ -376,7 +253,7 @@ case $yn in
             -DVTK_WRAP_JAVA=OFF \
             -DVTK_WRAP_PYTHON=OFF \
             -DVTK_WRAP_TCL=ON \
-            -DVTK_USE_SYSTEM_LIBRARIES=ON \
+            -DVTK_USE_SYSTEM_LIBRARIES=OFF \
             -DVTK_USE_SYSTEM_GL2PS=OFF \
             -DVTK_USE_SYSTEM_HDF5=ON \
             -DModule_vtkGUISupportQtOpenGL:BOOL=ON \
@@ -393,26 +270,9 @@ case $yn in
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
 esac
-#sed -i "s|/lib/cmake|/lib64/cmake|g" $DESTDIR/$LIBDIR/cmake/vtk-7.0/*.cmake
-#sed -i "s|/usr/lib/|/usr/lib64/|g" $DESTDIR/$LIBDIR/cmake/vtk-7.0/*.cmake
 
-echo "Module Prereq3"
-read -p "Create and activate? yes/no:  " yn
-case $yn in
-    [Yy]* ) echo "building..."
-        /opt/porteus-scripts/deactivate $/opt/prereq2.xzm
-        dir2xzm $DESTDIR /opt/prereq3.xzm
-        /opt/porteus-scripts/activate /opt/prereq3.xzm;;
-    [Nn]* ) echo "Skipping...";;
-    * ) echo "Please answer yes or no.";;
-esac
-
-
-#export OPENNI2_INCLUDE=/home/guest/Desktop/openni2/OpenNI-Linux-x64-2.2/Include
-#export OPENNI2_REDIST=/home/guest/Desktop/openni2/OpenNI-Linux-x64-2.2/Redist
-#cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
 #PCL
-echo "PCL"
+echo "PCL" #dep: eigen3, flann > 1.7.0, boost, VTK for visualization.
 read -p "Build? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
@@ -421,6 +281,7 @@ case $yn in
         cd pcl-pcl-1.8.0
         mkdir build && cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH=$DESTDIR$PREFIX \
             -DCMAKE_INSTALL_PREFIX=$PREFIX \
             -DLIB_INSTALL_DIR=$LIBDIR
         make -j5
@@ -433,28 +294,52 @@ case $yn in
     * ) echo "Please answer yes or no.";;
 esac
 
-echo "librealsense"
+echo "OpenCV"
 read -p "Build? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
-        cp -r sources/librealsense ./
-        cd librealsense
-        mkdir build && cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
-            -DLIB_INSTALL_DIR=$LIBDIR
+        cp -r sources/3.1.0.zip ./
+        cp -r sources/3.1.0.tar.gz ./
+        
+        unzip 3.1.0.zip
+        tar xf 3.1.0.tar.gz
+        cd opencv-3.1.0
+        mkdir build
+        cd build
+        cmake .. \
+            -DWITH_OPENNI2=ON \
+            -DWITH_QT=ON \
+            -DWITH_GDAL=ON \
+            -DWITH_OPENGL=ON \
+            -DWITH_TBB=ON \
+            -DWITH_XINE=ON \
+            -DWITH_GSTREAMER=OFF \
+            -DBUILD_WITH_DEBUG_INFO=OFF \
+            -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-3.1.0/modules \
+            -DWITH_VTK=OFF \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_PERF_TESTS=OFF \
+            -DBUILD_EXAMPLES=OFF \
+            -DINSTALL_C_EXAMPLES=OFF \
+            -DINSTALL_PYTHON_EXAMPLES=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=$PREFIX \
+            -DLIB_INSTALL_DIR=$LIBDIR \
+            -DCMAKE_PREFIX_PATH=$DESTDIR$PREFIX \
+            -DLIB_SUFFIX=64
         make -j5
-        make install DESTDIR=$DESTDIR
-        cd ../.. ;;
+        make install DESTDIR=$DESTDIR;;
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
 esac
 
-echo "Module PCL"
+
+echo "Module"
 read -p "Create and activate? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
-        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/pcl-freenect2-realsense-WithDep.xzm
-        /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/pcl-freenect2-realsense-WithDep.xzm;;
+        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/myModules.xzm
+        /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/myModules.xzm;;
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
 esac
