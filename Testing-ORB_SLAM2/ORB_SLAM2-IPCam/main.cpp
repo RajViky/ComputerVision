@@ -22,7 +22,7 @@ int main( int argc, char *argv[] )
     string Yaml = "../calibration/Honor3C-1280x720.yaml";
     //Video source
     cv::VideoCapture cap;
-    std::string videoStreamAddress = "http://192.168.1.47:8080/video";
+    std::string videoStreamAddress = "http://192.168.0.102:8080/video";
 
     if(arguments.size() != 3)
     {
