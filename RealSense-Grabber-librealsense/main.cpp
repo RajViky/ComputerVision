@@ -482,6 +482,38 @@ int main(int argc, char **argv) try
         calibration_file << "       1. ]" << std::endl;
         calibration_file.close();
     }
+    else if(name == "Intel RealSense SR300")
+    {
+        std::ofstream calibration_file;
+        calibration_file.open (calibration_path+"/"+calibration_name+".yaml");
+        calibration_file << "%YAML:1.0" << std::endl;
+        calibration_file << "camera_name: SR300" << std::endl;
+        calibration_file << "image_width: 640" << std::endl;
+        calibration_file << "image_height: 480" << std::endl;
+        calibration_file << "camera_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 3" << std::endl;
+        calibration_file << "   data: [ 5.7713505390250293e+02, 0., 3.1731811407800097e+02, 0.," << std::endl;
+        calibration_file << "       5.7758211233218947e+02, 2.4588867221764497e+02, 0., 0., 1. ]" << std::endl;
+        calibration_file << "distortion_coefficients:" << std::endl;
+        calibration_file << "   rows: 1" << std::endl;
+        calibration_file << "   cols: 5" << std::endl;
+        calibration_file << "   data: [ 7.4964535662279758e-02, -1.2651355462287939e-01," << std::endl;
+        calibration_file << "       1.8823065319262203e-03, -4.1500182006370582e-04," << std::endl;
+        calibration_file << "       -1.5578682456416146e-01 ]" << std::endl;
+        calibration_file << "distortion_model: plumb_bob" << std::endl;
+        calibration_file << "rectification_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 3" << std::endl;
+        calibration_file << "   data: [ 1., 0., 0., 0., 1., 0., 0., 0., 1. ]" << std::endl;
+        calibration_file << "projection_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 4" << std::endl;
+        calibration_file << "   data: [ 5.7713505390250293e+02, 0., 3.1731811407800097e+02, 0., 0.," << std::endl;
+        calibration_file << "       5.7758211233218947e+02, 2.4588867221764497e+02, 0., 0., 0., 1.," << std::endl;
+        calibration_file << "       1. ]" << std::endl;
+        calibration_file.close();
+    }
     dev.enable_stream(rs::stream::depth, depthWidth,depthHeight,rs::format::z16, depthF);
     dev.enable_stream(rs::stream::color, colorWidth,colorHeight,rs::format::rgb8, colorF);
     dev.start();
