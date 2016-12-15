@@ -26,6 +26,7 @@ void sigint_handler(int)
 
 int main(int argc, char **argv)
 {
+    std::vector<float> statistics;
     //Parameters parsing
     std::vector<std::string> args(argv, argv + argc);
     args.erase(args.begin());
@@ -222,40 +223,81 @@ int main(int argc, char **argv)
     }
 
     //Create Calibration file
-    std::string calibration_path = dir;
-    std::string calibration_name = "default";
-    std::ofstream calibration_file;
-    calibration_file.open (calibration_path+"/"+calibration_name+".yaml");
+    if(small)
+    {
+        std::string calibration_path = dir;
+        std::string calibration_name = "default";
+        std::ofstream calibration_file;
+        calibration_file.open (calibration_path+"/"+calibration_name+".yaml");
 
-    calibration_file << "%YAML:1.0" << std::endl;
-    calibration_file << "camera_name: calib2" << std::endl;
-    calibration_file << "image_width: 512" << std::endl;
-    calibration_file << "image_height: 424" << std::endl;
-    calibration_file << "camera_matrix:" << std::endl;
-    calibration_file << "   rows: 3" << std::endl;
-    calibration_file << "   cols: 3" << std::endl;
-    calibration_file << "   data: [ 3.6110206777979778e+02, 0., 2.6372018528793006e+02, 0.," << std::endl;
-    calibration_file << "       3.6097502114915272e+02, 1.7767928198595087e+02, 0., 0., 1. ]" << std::endl;
-    calibration_file << "distortion_coefficients:" << std::endl;
-    calibration_file << "   rows: 1" << std::endl;
-    calibration_file << "   cols: 5" << std::endl;
-    calibration_file << "   data: [ 1.1618214944736524e-01, -3.7391857743275664e-01," << std::endl;
-    calibration_file << "       -2.3108157640784072e-02, 4.0215076909925294e-03," << std::endl;
-    calibration_file << "       3.5294410947770366e-01 ]" << std::endl;
-    calibration_file << "distortion_model: plumb_bob" << std::endl;
-    calibration_file << "rectification_matrix:" << std::endl;
-    calibration_file << "   rows: 3" << std::endl;
-    calibration_file << "   cols: 3" << std::endl;
-    calibration_file << "   data: [ 1., 0., 0., 0., 1., 0., 0., 0., 1. ]" << std::endl;
-    calibration_file << "projection_matrix:" << std::endl;
-    calibration_file << "   rows: 3" << std::endl;
-    calibration_file << "   cols: 4" << std::endl;
-    calibration_file << "   data: [ 3.6110206777979778e+02, 0., 2.6372018528793006e+02," << std::endl;
-    calibration_file << "       4.0215076909925294e-03, 0., 3.6097502114915272e+02," << std::endl;
-    calibration_file << "       1.7767928198595087e+02, 0., 0., 0., 1., 1. ]" << std::endl;
+        calibration_file << "%YAML:1.0" << std::endl;
+        calibration_file << "camera_name: calib2" << std::endl;
+        calibration_file << "image_width: 512" << std::endl;
+        calibration_file << "image_height: 424" << std::endl;
+        calibration_file << "camera_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 3" << std::endl;
+        calibration_file << "   data: [ 3.6110206777979778e+02, 0., 2.6372018528793006e+02, 0.," << std::endl;
+        calibration_file << "       3.6097502114915272e+02, 1.7767928198595087e+02, 0., 0., 1. ]" << std::endl;
+        calibration_file << "distortion_coefficients:" << std::endl;
+        calibration_file << "   rows: 1" << std::endl;
+        calibration_file << "   cols: 5" << std::endl;
+        calibration_file << "   data: [ 1.1618214944736524e-01, -3.7391857743275664e-01," << std::endl;
+        calibration_file << "       -2.3108157640784072e-02, 4.0215076909925294e-03," << std::endl;
+        calibration_file << "       3.5294410947770366e-01 ]" << std::endl;
+        calibration_file << "distortion_model: plumb_bob" << std::endl;
+        calibration_file << "rectification_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 3" << std::endl;
+        calibration_file << "   data: [ 1., 0., 0., 0., 1., 0., 0., 0., 1. ]" << std::endl;
+        calibration_file << "projection_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 4" << std::endl;
+        calibration_file << "   data: [ 3.6110206777979778e+02, 0., 2.6372018528793006e+02," << std::endl;
+        calibration_file << "       4.0215076909925294e-03, 0., 3.6097502114915272e+02," << std::endl;
+        calibration_file << "       1.7767928198595087e+02, 0., 0., 0., 1., 1. ]" << std::endl;
 
-    calibration_file.close();
+        calibration_file.close();
+    }
+    if(big)
+    {
+        std::string calibration_path = dir;
+        std::string calibration_name = "default";
+        if(small)
+            calibration_name = "Depth2RGB";
+        std::ofstream calibration_file;
+        calibration_file.open (calibration_path+"/"+calibration_name+".yaml");
 
+        calibration_file << "%YAML:1.0" << std::endl;
+        calibration_file << "camera_name: kinectDepth2RGB" << std::endl;
+        calibration_file << "image_width: 1920" << std::endl;
+        calibration_file << "image_height: 1080" << std::endl;
+        calibration_file << "camera_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 3" << std::endl;
+        calibration_file << "   data: [ 9.8569962535918626e+02, 0., 9.5459050579352152e+02, 0.," << std::endl;
+        calibration_file << "       9.8860714269691027e+02, 5.2485522165604834e+02, 0., 0., 1. ]" << std::endl;
+        calibration_file << "distortion_coefficients:" << std::endl;
+        calibration_file << "   rows: 1" << std::endl;
+        calibration_file << "   cols: 5" << std::endl;
+        calibration_file << "   data: [ 1.5507460201662935e-02, -3.7667312458674697e-02," << std::endl;
+        calibration_file << "       -1.5243009561749790e-03, -2.3943595337389953e-03," << std::endl;
+        calibration_file << "       7.2021795540335989e-03 ]" << std::endl;
+        calibration_file << "distortion_model: plumb_bob" << std::endl;
+        calibration_file << "rectification_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 3" << std::endl;
+        calibration_file << "   data: [ 1., 0., 0., 0., 1., 0., 0., 0., 1. ]" << std::endl;
+        calibration_file << "projection_matrix:" << std::endl;
+        calibration_file << "   rows: 3" << std::endl;
+        calibration_file << "   cols: 4" << std::endl;
+        calibration_file << "   data: [ 9.8569962535918626e+02, 0., 9.5459050579352152e+02, 0., 0.," << std::endl;
+        calibration_file << "       9.8860714269691027e+02, 5.2485522165604834e+02, 0., 0., 0., 1.," << std::endl;
+        calibration_file << "       1. ]" << std::endl;
+
+
+        calibration_file.close();
+    }
 
     int types = 0;
     types |= libfreenect2::Frame::Color;
@@ -328,6 +370,8 @@ int main(int argc, char **argv)
         double diff = (t1-epoch).total_milliseconds()/1000.0;
         int last_diff = (t1-last_image).total_milliseconds();
         std::cout << last_diff << " ms from last image = " << 1000.0/(float)last_diff << "Hz" << std::endl;
+        if(framecount > 5)
+            statistics.push_back(1000.0/(float)last_diff);
         last_image = t1;
         std::stringstream ss;
         ss << std::fixed << std::setprecision(4) << diff;
@@ -367,7 +411,7 @@ int main(int argc, char **argv)
         if(big)
         {
             cv::flip(rgbMat,mirror,1);
-            imwrite( dir +"/Depth2RGB/rgb/tmp-rgb.png", mirror );
+            imwrite( dir +"/Depth2RGB/rgb/tmp-rgb.jpg", mirror );
             cv::flip(bigConverted,mirror,1);
             imwrite( dir +"/Depth2RGB/depth/tmp-depth.png", mirror );
         }
@@ -401,7 +445,7 @@ int main(int argc, char **argv)
         }
         if(big)
         {
-            boost::filesystem::rename(dir +"/Depth2RGB/rgb/tmp-rgb.png",dir +"/Depth2RGB/rgb/rgb.png");
+            boost::filesystem::rename(dir +"/Depth2RGB/rgb/tmp-rgb.jpg",dir +"/Depth2RGB/rgb/rgb.jpg");
             boost::filesystem::rename(dir +"/Depth2RGB/depth/tmp-depth.png",dir +"/Depth2RGB/depth/depth.png");
             if(depth_mat)
                 boost::filesystem::rename(dir +"/Depth2RGB/depth_mat/tmp-depth_mat.xml",dir +"/Depth2RGB/depth_mat/depth_mat.xml");
@@ -421,7 +465,7 @@ int main(int argc, char **argv)
             if(big)
             {
                 boost::filesystem::copy_file( dir +"/Depth2RGB/depth/depth.png",store_all +"/Depth2RGB/depth/"+time+".png");
-                boost::filesystem::copy_file( dir +"/Depth2RGB/rgb/rgb.png",store_all +"/Depth2RGB/rgb/"+time+".png");
+                boost::filesystem::copy_file( dir +"/Depth2RGB/rgb/rgb.jpg",store_all +"/Depth2RGB/rgb/"+time+".jpg");
                 if(depth_mat)
                     boost::filesystem::copy_file(dir +"/Depth2RGB/depth_mat/depth_mat.xml",store_all +"/Depth2RGB/depth_mat/"+time+".xml");
             }
@@ -433,6 +477,13 @@ int main(int argc, char **argv)
     dev->close();
 
     delete registration;
+    std::cout << " " << std::endl;
+    std::cout << " " << std::endl;
+    float avg;
+    for(auto f: statistics)
+        avg += f;
+    avg /= statistics.size();
+    std::cout << "Average Frame rate:" << avg << " Hz" << std::endl;
 
     return 0;
 }
