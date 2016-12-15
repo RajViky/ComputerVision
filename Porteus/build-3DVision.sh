@@ -11,11 +11,9 @@ echo "==========================================================================
 git clone https://github.com/TomasBedrnik/ComputerVision.git
 git clone https://github.com/TomasBedrnik/rtabmap.git
 
-read -rsp $'Press any key to continue...\n' -n1 key
-
 cd rtabmap/build
 cmake ..
-make -j5
+make -j2
 cd ../..
 
 cd ComputerVision/Kinect2-Grabber-libfreenect2
@@ -28,14 +26,22 @@ cd ../PCD-Transformer
 make
 cd ../..
 
-mkdir -p dirxzm/home/guest/Desktop/3DVision/rtabmap
-cp ComputerVision/Kinect2-Grabber-libfreenect2/grabber-kinect2 dirxzm/home/guest/Desktop/3DVision/
-cp ComputerVision/RealSense-Grabber-librealsense/grabber-realsense dirxzm/home/guest/Desktop/3DVision/
-cp ComputerVision/PCD-Viewer/viewer dirxzm/home/guest/Desktop/3DVision/
-cp ComputerVision/PCD-Transformer/transformer dirxzm/home/guest/Desktop/3DVision/
-cp rtabmap/bin/* dirxzm/home/guest/Desktop/3DVision/rtabmap
-cp ComputerVision/Porteus/mapper.sh dirxzm/home/guest/Desktop/3DVision/
-chown -R guest:users dirxzm
+mkdir -p /mnt/sda1/3DVision/rtabmap
+cp ComputerVision/Kinect2-Grabber-libfreenect2/grabber-kinect2 /mnt/sda1/3DVision/
+cp ComputerVision/RealSense-Grabber-librealsense/grabber-realsense /mnt/sda1/3DVision/
+cp ComputerVision/PCD-Viewer/viewer /mnt/sda1/3DVision/
+cp ComputerVision/PCD-Transformer/transformer /mnt/sda1/3DVision/
+cp rtabmap/bin/* /mnt/sda1/3DVision/rtabmap
+cp ComputerVision/Porteus/mapper.sh /mnt/sda1/3DVision/
 
-dir2xzm dirxzm /mnt/sda1/porteus/modules/my3DVision.xzm
-activate /mnt/sda1/porteus/modules/my3DVision.xzm
+# mkdir -p dirxzm/home/guest/Desktop/3DVision/rtabmap
+# cp ComputerVision/Kinect2-Grabber-libfreenect2/grabber-kinect2 dirxzm/home/guest/Desktop/3DVision/
+# cp ComputerVision/RealSense-Grabber-librealsense/grabber-realsense dirxzm/home/guest/Desktop/3DVision/
+# cp ComputerVision/PCD-Viewer/viewer dirxzm/home/guest/Desktop/3DVision/
+# cp ComputerVision/PCD-Transformer/transformer dirxzm/home/guest/Desktop/3DVision/
+# cp rtabmap/bin/* dirxzm/home/guest/Desktop/3DVision/rtabmap
+# cp ComputerVision/Porteus/mapper.sh dirxzm/home/guest/Desktop/3DVision/
+# chown -R guest:guest dirxzm
+# 
+# dir2xzm dirxzm /mnt/sda1/porteus/modules/my3DVision.xzm
+# activate /mnt/sda1/porteus/modules/my3DVision.xzm

@@ -144,6 +144,25 @@ case $yn in
     * ) echo "Please answer yes or no.";;
 esac
 
+echo "Module grabber libs"
+read -p "Create and activate? yes/no:  " yn
+case $yn in
+    [Yy]* ) echo "building..."
+        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/grabbersLibs.1.0.xzm
+        /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/grabbersLibs.1.0.xzm;;
+    [Nn]* ) echo "Skipping...";;
+    * ) echo "Please answer yes or no.";;
+esac
+
+
+export DESTDIR=/opt/playground2
+export PREFIX=/usr
+export LIBDIR=/usr/lib64
+export PATH=$DESTDIR/$PREFIX/usr/bin:$PATH
+export INCLUDE_PATH=$DESTDIR/usr/include:$INCLUDE_PATH
+export LIBRARY_PATH=$DESTDIR/$LIBDIR:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$DESTDIR/$LIBDIR:$LD_LIBRARY_PATH
+
 echo "FLANN"
 read -p "Build? yes/no:  " yn
 case $yn in
@@ -162,6 +181,7 @@ case $yn in
         make -j5
         make install DESTDIR=$DESTDIR
         cd ../..
+        mkdir -p $DESTDIR/$LIBDIR
         cp -r $DESTDIR/usr/lib/* $DESTDIR/$LIBDIR
         rm -rf $DESTDIR/usr/lib
         sed -i "s|/lib|/lib64|g" $DESTDIR/$LIBDIR/pkgconfig/flann.pc;;
@@ -294,6 +314,25 @@ case $yn in
     * ) echo "Please answer yes or no.";;
 esac
 
+
+echo "Module VTK PCL"
+read -p "Create and activate? yes/no:  " yn
+case $yn in
+    [Yy]* ) echo "building..."
+        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/VTKPCL.1.0.xzm
+        /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/VTKPCL.1.0.xzm;;
+    [Nn]* ) echo "Skipping...";;
+    * ) echo "Please answer yes or no.";;
+esac
+
+export DESTDIR=/opt/playgroundOpenCV
+export PREFIX=/usr
+export LIBDIR=/usr/lib64
+export PATH=$DESTDIR/$PREFIX/usr/bin:$PATH
+export INCLUDE_PATH=$DESTDIR/usr/include:$INCLUDE_PATH
+export LIBRARY_PATH=$DESTDIR/$LIBDIR:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$DESTDIR/$LIBDIR:$LD_LIBRARY_PATH
+
 echo "OpenCV"
 read -p "Build? yes/no:  " yn
 case $yn in
@@ -334,12 +373,12 @@ case $yn in
 esac
 
 
-echo "Module"
+echo "Module OpenCV"
 read -p "Create and activate? yes/no:  " yn
 case $yn in
     [Yy]* ) echo "building..."
-        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/myModules.xzm
-        /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/myModules.xzm;;
+        dir2xzm $DESTDIR /mnt/sda1/porteus/modules/OpenCV.3.1.0-1.xzm
+        /opt/porteus-scripts/activate /mnt/sda1/porteus/modules/OpenCV.3.1.0-1.xzm;;
     [Nn]* ) echo "Skipping...";;
     * ) echo "Please answer yes or no.";;
 esac
