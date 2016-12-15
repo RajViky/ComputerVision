@@ -16,6 +16,7 @@ void sigint_handler(int)
 }
 int main(int argc, char **argv) try
 {
+    std::vector<float> statistics;
     std::vector<std::string> args(argv, argv + argc);
     args.erase(args.begin());
     bool help = false;
@@ -58,8 +59,8 @@ int main(int argc, char **argv) try
             std::string type = arg.substr(5,arg.length()-5);
             if(type == "Depth2RGB")
             {
-                RGB2Depth = true;
-                Depth2RGB = false;
+                RGB2Depth = false;
+                Depth2RGB = true;
             }
             else if(type == "both" || type == "Both")
             {
@@ -514,14 +515,15 @@ int main(int argc, char **argv) try
         calibration_file << "       1. ]" << std::endl;
         calibration_file.close();
     }
+    //dev.enable_stream(rs::stream::depth, depthWidth,depthHeight,rs::format::z16, depthF);
     dev.enable_stream(rs::stream::depth, depthWidth,depthHeight,rs::format::z16, depthF);
-    dev.enable_stream(rs::stream::color, colorWidth,colorHeight,rs::format::rgb8, colorF);
+    dev.enable_stream(rs::stream::color, colorWidth,colorHeight,rs::format::bgr8, colorF);
     dev.start();
 
     while (!shutdown && (framemax == (size_t)-1 || framecount < framemax))
     {
         dev.wait_for_frames();
-
+        framecount++;
         boost::posix_time::ptime t1 = boost::posix_time::microsec_clock::local_time();
         if(freq > 0.0)
         {
@@ -534,6 +536,8 @@ int main(int argc, char **argv) try
         double diff = (t1-epoch).total_milliseconds()/1000.0;
         int last_diff = (t1-last_image).total_milliseconds();
         std::cout << last_diff << " ms from last image = " << 1000.0/(float)last_diff << "Hz" << std::endl;
+        if(framecount > 5)
+            statistics.push_back(1000.0/(float)last_diff);
         last_image = t1;
         std::stringstream ss;
         ss << std::fixed << std::setprecision(4) << diff;
@@ -598,6 +602,12 @@ int main(int argc, char **argv) try
             }
         }
     }
+
+    float avg;
+    for(auto f: statistics)
+        avg += f;
+    avg /= statistics.size();
+    std::cout << "Average Frame rate:" << avg << " Hz" << std::endl;
     return EXIT_SUCCESS;
 }
 catch(const rs::error & e)
