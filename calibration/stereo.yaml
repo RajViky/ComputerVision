@@ -1,0 +1,26 @@
+%YAML:1.0
+camera_name: stereo
+image_width: 640
+image_height: 480
+camera_matrix:
+   rows: 3
+   cols: 3
+   data: [ 289.194592919, 0., 317.511856495, 0.,
+       289.501356489, 208.22682646, 0., 0., 1. ]
+distortion_coefficients:
+   rows: 1
+   cols: 5
+   data: [ -0.21344266627, 0.0678553900861,
+       0.0064649563312, -0.00510813394131,
+       -0.0106945556685 ]
+distortion_model: plumb_bob
+rectification_matrix:
+   rows: 3
+   cols: 3
+   data: [ 1., 0., 0., 0., 1., 0., 0., 0., 1. ]
+projection_matrix:
+   rows: 3
+   cols: 4
+   data: [ 289.194592919, 0., 317.511856495, 0., 0.,
+       289.501356489, 208.22682646, 0., 0., 0., 1.,
+       1. ]

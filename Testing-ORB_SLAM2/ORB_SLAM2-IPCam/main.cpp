@@ -17,9 +17,10 @@ int main( int argc, char *argv[] )
     std::vector<std::string> arguments(argv + 1, argv + argc);
 
     //Vocabulary for detecting objects
-    string Vocabulary = "../../ORB_SLAM2/ORB_SLAM2/Vocabulary/ORBvoc.txt";
+    string Vocabulary = "/home/beda/data/skola/_Oulu/ORB_SLAM2/Vocabulary/ORBvoc.txt";
     //ConfigFile
-    string Yaml = "../calibration/Honor3C-1280x720.yaml";
+    //string Yaml = "/home/beda/data/skola/_Oulu/ComputerVision/calibration//Honor3C-1280x720.yaml";
+    string Yaml = "/home/beda/data/skola/_Oulu/ComputerVision/calibration//Honor3C-640x480.yaml";
     //Video source
     cv::VideoCapture cap;
     std::string videoStreamAddress = "http://192.168.0.102:8080/video";
